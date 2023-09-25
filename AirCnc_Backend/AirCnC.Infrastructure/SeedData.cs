@@ -21,7 +21,7 @@ public static class SeedData
             modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> {RoleId = roles[0].Id, UserId = admin.Id});
             
             var users = new Faker<User>()
-                .RuleFor(u => u.Id, f => f.IndexFaker + 3)
+                .RuleFor(u => u.Id, f => f.IndexFaker + 1)
                 .RuleFor(u => u.FullName, f => f.Name.FullName())
                 .RuleFor(u => u.Email, f => f.Internet.Email())
                 .RuleFor(u => u.UserName, (_, u) => u.Email)
@@ -51,9 +51,7 @@ public static class SeedData
             {
                 FullName = "Phuc Phan",
                 UserName = "admin",
-                NormalizedUserName = "ADMIN",
                 Email = "admin@gmail.com",
-                NormalizedEmail = "ADMIN@GMAIL.COM",
                 EmailConfirmed = true,
                 Id = 1,
                 SecurityStamp = Guid.NewGuid().ToString(),
