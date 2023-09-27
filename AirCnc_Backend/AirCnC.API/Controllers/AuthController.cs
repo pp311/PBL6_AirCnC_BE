@@ -12,8 +12,7 @@ public class AuthController : ControllerBase
 	private readonly ITokenService _tokenService;
 	public AuthController(
 		IAuthService authenticateService,
-		ITokenService tokenService
-		)
+		ITokenService tokenService)
 	{
 		_authenticateService = authenticateService;
 		_tokenService = tokenService;
@@ -45,5 +44,12 @@ public class AuthController : ControllerBase
 	{
 		await _tokenService.RevokeRefreshTokenAsync(refreshTokenDto.RefreshToken);
 		return Ok();
+	}
+	
+	[HttpPost("google-login")]
+	public async Task<IActionResult> GoogleLoginAsync(ExternalAuthDto dto)
+	{
+		var result = await _authenticateService.GoogleAuthenticateAsync(dto);
+		return Ok(result);
 	}
 }
