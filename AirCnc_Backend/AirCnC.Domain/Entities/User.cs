@@ -1,4 +1,3 @@
-using AirCnC.Domain.Entities.Base;
 using Microsoft.AspNetCore.Identity;
 
 namespace AirCnC.Domain.Entities;
