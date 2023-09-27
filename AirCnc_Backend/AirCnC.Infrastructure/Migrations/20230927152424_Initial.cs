@@ -41,7 +41,6 @@ namespace AirCnC.Infrastructure.Migrations
                     Country = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     AvatarUrl = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
                     Introduction = table.Column<string>(type: "nvarchar(1024)", maxLength: 1024, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
@@ -773,20 +772,20 @@ namespace AirCnC.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "Address", "AvatarUrl", "City", "ConcurrencyStamp", "Country", "Email", "EmailConfirmed", "FullName", "Introduction", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "State", "TwoFactorEnabled", "UserName" },
+                columns: new[] { "Id", "AccessFailedCount", "Address", "AvatarUrl", "City", "ConcurrencyStamp", "Country", "Email", "EmailConfirmed", "FullName", "Introduction", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "State", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { 1, 0, null, null, null, "c1226c3a-6769-4e60-be64-3d92ed93ecfa", null, "admin@gmail.com", true, "Phuc Phan", null, false, false, null, "ADMIN@GMAIL.COM", "ADMIN", "AQAAAAIAAYagAAAAELz+UBsGb+gWZYknAD2NlnMBTyZbmCN7MzHqfzkr8GHwVsoL/pdvLiUei1DjRhweIA==", null, false, "b8dea0bd-4546-43c4-853c-fbae9ab4e1e1", null, false, "admin" },
-                    { 3, 0, null, null, null, "f301ad66-3c57-4aad-8df4-834bbc118938", null, "Rico_Hahn37@hotmail.com", false, "Brady Waters", null, false, false, null, null, null, null, null, false, "c0ca9b7f-6a6c-4956-9983-4c6224ba5d0e", null, false, "Rico_Hahn37@hotmail.com" },
-                    { 4, 0, null, null, null, "a0e53abc-3363-4807-97aa-b4d87629a9ec", null, "Jedidiah_Herman46@gmail.com", false, "Blaise Farrell", null, false, false, null, null, null, null, null, false, "3b6158c5-db33-4eb1-a103-2f34b5cc95f1", null, false, "Jedidiah_Herman46@gmail.com" },
-                    { 5, 0, null, null, null, "b5282f15-5635-4bc1-8121-f59887a8144f", null, "Barrett59@gmail.com", false, "Verona Kemmer", null, false, false, null, null, null, null, null, false, "3b9a30b8-e1d7-42cd-a869-a049ea1b3723", null, false, "Barrett59@gmail.com" },
-                    { 6, 0, null, null, null, "8c7a6a6f-ff84-4f4f-8c37-ace3fed53a6f", null, "Lia.Braun@yahoo.com", false, "Loren O'Keefe", null, false, false, null, null, null, null, null, false, "28b18f33-ab7e-4f64-93ce-c6bdc229b845", null, false, "Lia.Braun@yahoo.com" },
-                    { 7, 0, null, null, null, "ef438abe-0371-4808-8326-4a7e46cf02b5", null, "Anissa_McGlynn29@yahoo.com", false, "Vilma Kreiger", null, false, false, null, null, null, null, null, false, "6dc9fbcf-9400-445e-b683-7099011e4d99", null, false, "Anissa_McGlynn29@yahoo.com" },
-                    { 8, 0, null, null, null, "94ed5cc1-9049-4c30-acb8-a3a3805d6bb3", null, "Kaela.Schulist35@hotmail.com", false, "Mason Fay", null, false, false, null, null, null, null, null, false, "7839442a-53c8-4d0a-b87a-a794030dfcd5", null, false, "Kaela.Schulist35@hotmail.com" },
-                    { 9, 0, null, null, null, "095382bc-29f4-447d-8f44-750b76cb5f6d", null, "Kody94@hotmail.com", false, "Madisyn Parker", null, false, false, null, null, null, null, null, false, "e18d5907-5461-4ca6-bed5-7a0e5f91ed4c", null, false, "Kody94@hotmail.com" },
-                    { 10, 0, null, null, null, "730c05ee-d999-4519-a9f6-3669e2de2a75", null, "Delbert_Hane@gmail.com", false, "General Daugherty", null, false, false, null, null, null, null, null, false, "9cf013f6-6648-4cb2-8496-426e798bbc65", null, false, "Delbert_Hane@gmail.com" },
-                    { 11, 0, null, null, null, "35571b9a-dc50-48ed-88e7-fd95740d41cb", null, "Emory_Barrows11@yahoo.com", false, "Maryse Altenwerth", null, false, false, null, null, null, null, null, false, "323074ea-c544-4870-b31b-de2a19b78dd9", null, false, "Emory_Barrows11@yahoo.com" },
-                    { 12, 0, null, null, null, "70db9ad9-c775-437b-b5bc-1cf62b7ea8c5", null, "Newton_Fritsch68@hotmail.com", false, "Geoffrey Shields", null, false, false, null, null, null, null, null, false, "570095c0-e6cd-44e2-84ec-04eb3b1cc0f1", null, false, "Newton_Fritsch68@hotmail.com" }
+                    { 1, 0, null, null, null, "f923ae81-acf5-45d7-a859-882b156844a2", null, "admin@gmail.com", true, "Phuc Phan", null, false, null, "ADMIN@GMAIL.COM", "ADMIN", "AQAAAAIAAYagAAAAEOcHUX0eZK1EIzx9oYtoAoD6dqSr29END2IWiIGvBbKtmbt3s2JSsyTWHP2xJMxqhg==", null, false, "3d5a193a-df6e-426e-8a3e-b3142a2786a6", null, false, "admin" },
+                    { 2, 0, null, null, null, "4c897223-1119-4348-ad6a-121ca2592eac", null, "Mia96@hotmail.com", false, "Rupert Weimann", null, false, null, "MIA96@HOTMAIL.COM", "MIA96@HOTMAIL.COM", "AQAAAAIAAYagAAAAEPFMGVIRdSIqNAt3dNxlgqjHRveYjZ5uSrGm54pVQIJizHOYIZTaOxZNWe2cCApDMg==", null, false, "c59b70a3-a191-4a98-b95c-30f94690cc4c", null, false, "Mia96@hotmail.com" },
+                    { 3, 0, null, null, null, "26231d5c-9681-4619-b022-db94d59ec70e", null, "Jettie_Miller96@yahoo.com", false, "Ida Weimann", null, false, null, "JETTIE_MILLER96@YAHOO.COM", "JETTIE_MILLER96@YAHOO.COM", "AQAAAAIAAYagAAAAEO3qZixKd1Jco/V0wD3XGLgOlGhwg4QoPEpxttwHyqKzRrf73j2bMhP1ASaJVqQrWw==", null, false, "bbdde3fd-6236-46fb-8edb-519a01a75d18", null, false, "Jettie_Miller96@yahoo.com" },
+                    { 4, 0, null, null, null, "ca871dca-4033-49c9-94ac-382b921f2cc9", null, "Sven_Kuvalis31@gmail.com", false, "Martine Hoeger", null, false, null, "SVEN_KUVALIS31@GMAIL.COM", "SVEN_KUVALIS31@GMAIL.COM", "AQAAAAIAAYagAAAAEICFnfhyPhPn6q8mptzw8sVOJaaG+QqGD4ZOMPCZfsj2ZYZLaJmxaV40APZqBUbouw==", null, false, "191c49a7-7872-4ffe-beb2-cd6f04bd57b2", null, false, "Sven_Kuvalis31@gmail.com" },
+                    { 5, 0, null, null, null, "9fc0f99a-539f-442e-8de6-7a16b89e2cfe", null, "Efren_Hills7@gmail.com", false, "Hassan Erdman", null, false, null, "EFREN_HILLS7@GMAIL.COM", "EFREN_HILLS7@GMAIL.COM", "AQAAAAIAAYagAAAAEMfPUiNO/hiy2Gq2kUZJ566oE7KsbyRfph9jGcB5TXe/9DHyqZkzEM2Lt5aWZZMEbg==", null, false, "783f6630-e758-489a-b4c3-98a6ea6cee33", null, false, "Efren_Hills7@gmail.com" },
+                    { 6, 0, null, null, null, "cb3818c8-290f-4bd2-affe-891ed23e26ca", null, "Ethelyn.Nienow68@yahoo.com", false, "Marcelo Kub", null, false, null, "ETHELYN.NIENOW68@YAHOO.COM", "ETHELYN.NIENOW68@YAHOO.COM", "AQAAAAIAAYagAAAAEHojSQTfWQT3TZusmf4MbMyK7pM9V9takxAQqvu/3+vKKEPEoWAJ/vgaoyI/tKUDGw==", null, false, "1562f18e-1eef-4ab8-9d94-36357a8e8534", null, false, "Ethelyn.Nienow68@yahoo.com" },
+                    { 7, 0, null, null, null, "a3af1360-91a1-4e7c-8813-76c7b6c2ba44", null, "Chad_Nienow@hotmail.com", false, "Pasquale Johns", null, false, null, "CHAD_NIENOW@HOTMAIL.COM", "CHAD_NIENOW@HOTMAIL.COM", "AQAAAAIAAYagAAAAEAilvTnOYLFZTd3mHvFVodWi+DguYmwgSUsidzubqRygL+/5YJYed+3PtlnEdlH+HQ==", null, false, "68a12ab5-f465-4290-803b-4da477ec5557", null, false, "Chad_Nienow@hotmail.com" },
+                    { 8, 0, null, null, null, "5985a9b9-1388-4e8f-9b84-d082add74348", null, "Lyric16@yahoo.com", false, "Philip Satterfield", null, false, null, "LYRIC16@YAHOO.COM", "LYRIC16@YAHOO.COM", "AQAAAAIAAYagAAAAEP7F2lIBl8h0/G9E7ZpgJ8mtW7E7kFnYWeLmI6LW6VS4Jtzj9x0yYQ83cJkTM/JSqA==", null, false, "4f39caa3-3897-4272-b6db-0580b617d074", null, false, "Lyric16@yahoo.com" },
+                    { 9, 0, null, null, null, "c7660448-97f2-44fb-bc1a-c6366e5fdd2b", null, "Jackeline_Veum53@gmail.com", false, "Jayson Schroeder", null, false, null, "JACKELINE_VEUM53@GMAIL.COM", "JACKELINE_VEUM53@GMAIL.COM", "AQAAAAIAAYagAAAAEMGvD4T/4htXpunvQEjgyhEEZfNuog9m8EoF1dTpyE8M/VQqnI58ZiSu2V9CA03KvQ==", null, false, "43998486-58bd-4876-a98c-bfe384a2f5f5", null, false, "Jackeline_Veum53@gmail.com" },
+                    { 10, 0, null, null, null, "022497ba-581c-4a20-888e-cc9043d2c523", null, "Martina66@yahoo.com", false, "Orlo Herman", null, false, null, "MARTINA66@YAHOO.COM", "MARTINA66@YAHOO.COM", "AQAAAAIAAYagAAAAEPdUMzseVEwhDlzPv664kEEDz/6uKLw7yXN+ErcfXxizFyRV/hkZsv+eFLSpVA43ww==", null, false, "466e6d9c-7fe1-45a4-83eb-b6c9d13838af", null, false, "Martina66@yahoo.com" },
+                    { 11, 0, null, null, null, "d5f3ef0e-d054-4a0d-bd84-76225b19e619", null, "Ezekiel79@gmail.com", false, "Lourdes Lemke", null, false, null, "EZEKIEL79@GMAIL.COM", "EZEKIEL79@GMAIL.COM", "AQAAAAIAAYagAAAAEKKgr9RG3GbEXRH60mAbUYE6pfm64ccxGCHABhIdkZb4DjsiSrJFBCLspB+Bn+WRxQ==", null, false, "b363601a-858a-47bc-ac9b-599935df2e6d", null, false, "Ezekiel79@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -795,6 +794,7 @@ namespace AirCnC.Infrastructure.Migrations
                 values: new object[,]
                 {
                     { 1, 1 },
+                    { 2, 2 },
                     { 2, 3 },
                     { 2, 4 },
                     { 2, 5 },
@@ -803,8 +803,7 @@ namespace AirCnC.Infrastructure.Migrations
                     { 2, 8 },
                     { 2, 9 },
                     { 2, 10 },
-                    { 2, 11 },
-                    { 2, 12 }
+                    { 2, 11 }
                 });
 
             migrationBuilder.CreateIndex(

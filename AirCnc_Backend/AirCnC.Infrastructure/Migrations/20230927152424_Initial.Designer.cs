@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AirCnC.Infrastructure.Migrations
 {
     [DbContext(typeof(AirCnCDbContext))]
-    [Migration("20230925125657_Initial")]
+    [Migration("20230927152424_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -1038,9 +1038,6 @@ namespace AirCnC.Infrastructure.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -1096,169 +1093,188 @@ namespace AirCnC.Infrastructure.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c1226c3a-6769-4e60-be64-3d92ed93ecfa",
+                            ConcurrencyStamp = "f923ae81-acf5-45d7-a859-882b156844a2",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             FullName = "Phuc Phan",
-                            IsDeleted = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAELz+UBsGb+gWZYknAD2NlnMBTyZbmCN7MzHqfzkr8GHwVsoL/pdvLiUei1DjRhweIA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOcHUX0eZK1EIzx9oYtoAoD6dqSr29END2IWiIGvBbKtmbt3s2JSsyTWHP2xJMxqhg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b8dea0bd-4546-43c4-853c-fbae9ab4e1e1",
+                            SecurityStamp = "3d5a193a-df6e-426e-8a3e-b3142a2786a6",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
                         new
                         {
+                            Id = 2,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "4c897223-1119-4348-ad6a-121ca2592eac",
+                            Email = "Mia96@hotmail.com",
+                            EmailConfirmed = false,
+                            FullName = "Rupert Weimann",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MIA96@HOTMAIL.COM",
+                            NormalizedUserName = "MIA96@HOTMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPFMGVIRdSIqNAt3dNxlgqjHRveYjZ5uSrGm54pVQIJizHOYIZTaOxZNWe2cCApDMg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c59b70a3-a191-4a98-b95c-30f94690cc4c",
+                            TwoFactorEnabled = false,
+                            UserName = "Mia96@hotmail.com"
+                        },
+                        new
+                        {
                             Id = 3,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f301ad66-3c57-4aad-8df4-834bbc118938",
-                            Email = "Rico_Hahn37@hotmail.com",
+                            ConcurrencyStamp = "26231d5c-9681-4619-b022-db94d59ec70e",
+                            Email = "Jettie_Miller96@yahoo.com",
                             EmailConfirmed = false,
-                            FullName = "Brady Waters",
-                            IsDeleted = false,
+                            FullName = "Ida Weimann",
                             LockoutEnabled = false,
+                            NormalizedEmail = "JETTIE_MILLER96@YAHOO.COM",
+                            NormalizedUserName = "JETTIE_MILLER96@YAHOO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEO3qZixKd1Jco/V0wD3XGLgOlGhwg4QoPEpxttwHyqKzRrf73j2bMhP1ASaJVqQrWw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c0ca9b7f-6a6c-4956-9983-4c6224ba5d0e",
+                            SecurityStamp = "bbdde3fd-6236-46fb-8edb-519a01a75d18",
                             TwoFactorEnabled = false,
-                            UserName = "Rico_Hahn37@hotmail.com"
+                            UserName = "Jettie_Miller96@yahoo.com"
                         },
                         new
                         {
                             Id = 4,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a0e53abc-3363-4807-97aa-b4d87629a9ec",
-                            Email = "Jedidiah_Herman46@gmail.com",
+                            ConcurrencyStamp = "ca871dca-4033-49c9-94ac-382b921f2cc9",
+                            Email = "Sven_Kuvalis31@gmail.com",
                             EmailConfirmed = false,
-                            FullName = "Blaise Farrell",
-                            IsDeleted = false,
+                            FullName = "Martine Hoeger",
                             LockoutEnabled = false,
+                            NormalizedEmail = "SVEN_KUVALIS31@GMAIL.COM",
+                            NormalizedUserName = "SVEN_KUVALIS31@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEICFnfhyPhPn6q8mptzw8sVOJaaG+QqGD4ZOMPCZfsj2ZYZLaJmxaV40APZqBUbouw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3b6158c5-db33-4eb1-a103-2f34b5cc95f1",
+                            SecurityStamp = "191c49a7-7872-4ffe-beb2-cd6f04bd57b2",
                             TwoFactorEnabled = false,
-                            UserName = "Jedidiah_Herman46@gmail.com"
+                            UserName = "Sven_Kuvalis31@gmail.com"
                         },
                         new
                         {
                             Id = 5,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b5282f15-5635-4bc1-8121-f59887a8144f",
-                            Email = "Barrett59@gmail.com",
+                            ConcurrencyStamp = "9fc0f99a-539f-442e-8de6-7a16b89e2cfe",
+                            Email = "Efren_Hills7@gmail.com",
                             EmailConfirmed = false,
-                            FullName = "Verona Kemmer",
-                            IsDeleted = false,
+                            FullName = "Hassan Erdman",
                             LockoutEnabled = false,
+                            NormalizedEmail = "EFREN_HILLS7@GMAIL.COM",
+                            NormalizedUserName = "EFREN_HILLS7@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMfPUiNO/hiy2Gq2kUZJ566oE7KsbyRfph9jGcB5TXe/9DHyqZkzEM2Lt5aWZZMEbg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3b9a30b8-e1d7-42cd-a869-a049ea1b3723",
+                            SecurityStamp = "783f6630-e758-489a-b4c3-98a6ea6cee33",
                             TwoFactorEnabled = false,
-                            UserName = "Barrett59@gmail.com"
+                            UserName = "Efren_Hills7@gmail.com"
                         },
                         new
                         {
                             Id = 6,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8c7a6a6f-ff84-4f4f-8c37-ace3fed53a6f",
-                            Email = "Lia.Braun@yahoo.com",
+                            ConcurrencyStamp = "cb3818c8-290f-4bd2-affe-891ed23e26ca",
+                            Email = "Ethelyn.Nienow68@yahoo.com",
                             EmailConfirmed = false,
-                            FullName = "Loren O'Keefe",
-                            IsDeleted = false,
+                            FullName = "Marcelo Kub",
                             LockoutEnabled = false,
+                            NormalizedEmail = "ETHELYN.NIENOW68@YAHOO.COM",
+                            NormalizedUserName = "ETHELYN.NIENOW68@YAHOO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHojSQTfWQT3TZusmf4MbMyK7pM9V9takxAQqvu/3+vKKEPEoWAJ/vgaoyI/tKUDGw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "28b18f33-ab7e-4f64-93ce-c6bdc229b845",
+                            SecurityStamp = "1562f18e-1eef-4ab8-9d94-36357a8e8534",
                             TwoFactorEnabled = false,
-                            UserName = "Lia.Braun@yahoo.com"
+                            UserName = "Ethelyn.Nienow68@yahoo.com"
                         },
                         new
                         {
                             Id = 7,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ef438abe-0371-4808-8326-4a7e46cf02b5",
-                            Email = "Anissa_McGlynn29@yahoo.com",
+                            ConcurrencyStamp = "a3af1360-91a1-4e7c-8813-76c7b6c2ba44",
+                            Email = "Chad_Nienow@hotmail.com",
                             EmailConfirmed = false,
-                            FullName = "Vilma Kreiger",
-                            IsDeleted = false,
+                            FullName = "Pasquale Johns",
                             LockoutEnabled = false,
+                            NormalizedEmail = "CHAD_NIENOW@HOTMAIL.COM",
+                            NormalizedUserName = "CHAD_NIENOW@HOTMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAilvTnOYLFZTd3mHvFVodWi+DguYmwgSUsidzubqRygL+/5YJYed+3PtlnEdlH+HQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6dc9fbcf-9400-445e-b683-7099011e4d99",
+                            SecurityStamp = "68a12ab5-f465-4290-803b-4da477ec5557",
                             TwoFactorEnabled = false,
-                            UserName = "Anissa_McGlynn29@yahoo.com"
+                            UserName = "Chad_Nienow@hotmail.com"
                         },
                         new
                         {
                             Id = 8,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "94ed5cc1-9049-4c30-acb8-a3a3805d6bb3",
-                            Email = "Kaela.Schulist35@hotmail.com",
+                            ConcurrencyStamp = "5985a9b9-1388-4e8f-9b84-d082add74348",
+                            Email = "Lyric16@yahoo.com",
                             EmailConfirmed = false,
-                            FullName = "Mason Fay",
-                            IsDeleted = false,
+                            FullName = "Philip Satterfield",
                             LockoutEnabled = false,
+                            NormalizedEmail = "LYRIC16@YAHOO.COM",
+                            NormalizedUserName = "LYRIC16@YAHOO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP7F2lIBl8h0/G9E7ZpgJ8mtW7E7kFnYWeLmI6LW6VS4Jtzj9x0yYQ83cJkTM/JSqA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7839442a-53c8-4d0a-b87a-a794030dfcd5",
+                            SecurityStamp = "4f39caa3-3897-4272-b6db-0580b617d074",
                             TwoFactorEnabled = false,
-                            UserName = "Kaela.Schulist35@hotmail.com"
+                            UserName = "Lyric16@yahoo.com"
                         },
                         new
                         {
                             Id = 9,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "095382bc-29f4-447d-8f44-750b76cb5f6d",
-                            Email = "Kody94@hotmail.com",
+                            ConcurrencyStamp = "c7660448-97f2-44fb-bc1a-c6366e5fdd2b",
+                            Email = "Jackeline_Veum53@gmail.com",
                             EmailConfirmed = false,
-                            FullName = "Madisyn Parker",
-                            IsDeleted = false,
+                            FullName = "Jayson Schroeder",
                             LockoutEnabled = false,
+                            NormalizedEmail = "JACKELINE_VEUM53@GMAIL.COM",
+                            NormalizedUserName = "JACKELINE_VEUM53@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMGvD4T/4htXpunvQEjgyhEEZfNuog9m8EoF1dTpyE8M/VQqnI58ZiSu2V9CA03KvQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e18d5907-5461-4ca6-bed5-7a0e5f91ed4c",
+                            SecurityStamp = "43998486-58bd-4876-a98c-bfe384a2f5f5",
                             TwoFactorEnabled = false,
-                            UserName = "Kody94@hotmail.com"
+                            UserName = "Jackeline_Veum53@gmail.com"
                         },
                         new
                         {
                             Id = 10,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "730c05ee-d999-4519-a9f6-3669e2de2a75",
-                            Email = "Delbert_Hane@gmail.com",
+                            ConcurrencyStamp = "022497ba-581c-4a20-888e-cc9043d2c523",
+                            Email = "Martina66@yahoo.com",
                             EmailConfirmed = false,
-                            FullName = "General Daugherty",
-                            IsDeleted = false,
+                            FullName = "Orlo Herman",
                             LockoutEnabled = false,
+                            NormalizedEmail = "MARTINA66@YAHOO.COM",
+                            NormalizedUserName = "MARTINA66@YAHOO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPdUMzseVEwhDlzPv664kEEDz/6uKLw7yXN+ErcfXxizFyRV/hkZsv+eFLSpVA43ww==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9cf013f6-6648-4cb2-8496-426e798bbc65",
+                            SecurityStamp = "466e6d9c-7fe1-45a4-83eb-b6c9d13838af",
                             TwoFactorEnabled = false,
-                            UserName = "Delbert_Hane@gmail.com"
+                            UserName = "Martina66@yahoo.com"
                         },
                         new
                         {
                             Id = 11,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "35571b9a-dc50-48ed-88e7-fd95740d41cb",
-                            Email = "Emory_Barrows11@yahoo.com",
+                            ConcurrencyStamp = "d5f3ef0e-d054-4a0d-bd84-76225b19e619",
+                            Email = "Ezekiel79@gmail.com",
                             EmailConfirmed = false,
-                            FullName = "Maryse Altenwerth",
-                            IsDeleted = false,
+                            FullName = "Lourdes Lemke",
                             LockoutEnabled = false,
+                            NormalizedEmail = "EZEKIEL79@GMAIL.COM",
+                            NormalizedUserName = "EZEKIEL79@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKKgr9RG3GbEXRH60mAbUYE6pfm64ccxGCHABhIdkZb4DjsiSrJFBCLspB+Bn+WRxQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "323074ea-c544-4870-b31b-de2a19b78dd9",
+                            SecurityStamp = "b363601a-858a-47bc-ac9b-599935df2e6d",
                             TwoFactorEnabled = false,
-                            UserName = "Emory_Barrows11@yahoo.com"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "70db9ad9-c775-437b-b5bc-1cf62b7ea8c5",
-                            Email = "Newton_Fritsch68@hotmail.com",
-                            EmailConfirmed = false,
-                            FullName = "Geoffrey Shields",
-                            IsDeleted = false,
-                            LockoutEnabled = false,
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "570095c0-e6cd-44e2-84ec-04eb3b1cc0f1",
-                            TwoFactorEnabled = false,
-                            UserName = "Newton_Fritsch68@hotmail.com"
+                            UserName = "Ezekiel79@gmail.com"
                         });
                 });
 
@@ -1435,6 +1451,11 @@ namespace AirCnC.Infrastructure.Migrations
                         },
                         new
                         {
+                            UserId = 2,
+                            RoleId = 2
+                        },
+                        new
+                        {
                             UserId = 3,
                             RoleId = 2
                         },
@@ -1476,11 +1497,6 @@ namespace AirCnC.Infrastructure.Migrations
                         new
                         {
                             UserId = 11,
-                            RoleId = 2
-                        },
-                        new
-                        {
-                            UserId = 12,
                             RoleId = 2
                         });
                 });

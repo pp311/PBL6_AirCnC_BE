@@ -78,6 +78,7 @@ public static class ServiceExtensions
     public static IServiceCollection ConfigureConfigurations(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+		services.Configure<GoogleSettings>(configuration.GetSection("Authentication:Google"));
 		return services;
 	}
    
@@ -85,7 +86,7 @@ public static class ServiceExtensions
     {
 	    var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>() 
                                   ?? throw new NullReferenceException("JwtSettings not found");
-	    
+
 	    services.AddAuthentication(options =>
 		    {
 			    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,18 +96,18 @@ public static class ServiceExtensions
 		    .AddJwtBearer(options =>
 		    {
 			    options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ClockSkew = TimeSpan.Zero,
+			    {
+				    ValidateIssuer = true,
+				    ValidateAudience = true,
+				    ValidateLifetime = true,
+				    ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = jwtSettings.ValidIssuer,
-                    ValidAudience = jwtSettings.ValidAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.
-                        GetBytes(jwtSettings.SecurityKey ?? throw new Exception("SecurityKey is null.)"))),
-                };
+				    ValidIssuer = jwtSettings.ValidIssuer,
+				    ValidAudience = jwtSettings.ValidAudience,
+				    IssuerSigningKey = new SymmetricSecurityKey(
+					    Encoding.UTF8.GetBytes(jwtSettings.SecurityKey ??
+					                           throw new Exception("SecurityKey is null.)"))),
+			    };
 		    });
 		return services;
 	}
