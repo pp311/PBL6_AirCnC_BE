@@ -6,14 +6,20 @@
       dockerfile: AirCnC.API/Dockerfile
     ports:
       - "5000:80"
+      - "5001:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:80;https://+:443
       - ConnectionStrings__DefaultConnection=Server=db,1433;Database=AirCnCDb;User=sa;Password=Admin123;TrustServerCertificate=False;Encrypt=False;
       - JWTSettings__AccessTokenExpiryInMinutes=0.2
       - JWTSettings__RefreshTokenExpiryInMinutes=0.5
+      - Kestrel__Certificates__Default__Password=Admin123
+      - Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+        - ./AirCnC.API/https:/https/
     depends_on: 
       - db
+    restart: on-failure
   db:
     image: mcr.microsoft.com/mssql/server
     environment:

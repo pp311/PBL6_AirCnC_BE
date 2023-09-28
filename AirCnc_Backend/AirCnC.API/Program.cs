@@ -17,7 +17,9 @@ builder.Services.AddDbContext(builder.Configuration)
     .AddCurrentUser()
     .AddApplicationCors()
     .ConfigureIdentity()
-    .ConfigureConfigurations(builder.Configuration);
+    .ConfigureConfigurations(builder.Configuration)
+    .AddAuthentication(builder.Configuration)
+    .AddSwagger("AirCnC");
 
 builder.Services.AddAutoMapper(typeof(IApplicationAssemblyMarker));
 
@@ -34,7 +36,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCustomExceptionHandler(app.Environment);
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

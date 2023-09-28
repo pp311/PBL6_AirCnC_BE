@@ -5,6 +5,10 @@ using AirCnC.Domain.Entities;
 using AirCnC.Domain.Exceptions;
 using AirCnC.Domain.Exceptions.Auth;
 using AutoMapper;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Oauth2.v2;
+using Google.Apis.Oauth2.v2.Data;
+using Google.Apis.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace AirCnC.Application.Services.Auth;
@@ -14,6 +18,7 @@ public interface IAuthService
     Task<TokenDto> LoginAsync(LoginDto logInDto);
     Task SignUpAsync(SignUpDto signUpDto);
     Task<TokenDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
+    Task<TokenDto> GoogleAuthenticateAsync(ExternalAuthDto dto);
 }
 
 public class AuthService : IAuthService
@@ -88,7 +93,30 @@ public class AuthService : IAuthService
         
         return tokenDto;
     }
-    
+
+    public async Task<TokenDto> GoogleAuthenticateAsync(ExternalAuthDto dto)
+    {
+        // get user info from access token
+        var userInfo = await new Oauth2Service(new BaseClientService.Initializer
+        {
+            HttpClientInitializer = GoogleCredential.FromAccessToken(dto.AccessToken),
+            ApplicationName = "AirCnC"
+        }).Userinfo.Get().ExecuteAsync();
+        
+        var user = await GetOrCreateUserAsync(userInfo);
+        
+        var tokenDto = new TokenDto
+        {
+            AccessToken = await _tokenService.GenerateAccessTokenAsync(user.Id),
+            RefreshToken = _tokenService.GenerateRefreshToken(),
+            User = _mapper.Map<GetUserDto>(user)
+        };
+        
+        await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
+        
+        return tokenDto;
+    }
+
     public async Task<TokenDto> LoginAsync(LoginDto logInDto)
     {
         var user = await _userManager.FindByNameAsync(logInDto.Identifier)
@@ -113,5 +141,44 @@ public class AuthService : IAuthService
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
         
         return tokenDto;
-    } 
+    }
+
+    private async Task<User> GetOrCreateUserAsync(Userinfo payload)
+    {
+        var user = await _userManager.FindByEmailAsync(payload.Email);
+        if (user != null) return user;
+        
+        user = new User
+        {
+            Email = payload.Email,
+            UserName = payload.Email,
+            FullName = payload.Name,
+            EmailConfirmed = true,
+            AvatarUrl = payload.Picture
+        };
+
+        await _unitOfWork.BeginTransactionAsync();
+
+        // UserManager mac dinh sau khi goi ham se save luon, neu goi nhieu ham cua UserManager thi can dung transaction
+        // de dam bao du lieu duoc luu khi tat ca cac ham duoc goi thanh cong
+        try
+        {
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+                throw new UserCreateFailException(result.Errors.First().Description);
+
+            var addRoleResult = await _userManager.AddToRoleAsync(user, AppRole.User);
+            if (!addRoleResult.Succeeded)
+                throw new UserCreateFailException(result.Errors.First().Description);
+            
+            await _unitOfWork.CommitTransactionAsync();
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync();
+            throw; 
+        }
+        
+        return user; 
+    }
 }
