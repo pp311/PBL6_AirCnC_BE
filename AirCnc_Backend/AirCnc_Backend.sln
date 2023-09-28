@@ -1,12 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirCnC.API", "AirCnC.API\AirCnC.API.csproj", "{F2CD7D22-E0CD-4130-8572-F7C06C95953E}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34018.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirCnC.API", "AirCnC.API\AirCnC.API.csproj", "{F2CD7D22-E0CD-4130-8572-F7C06C95953E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FF606310-22FE-471D-9B64-FA60D9025DA9} = {FF606310-22FE-471D-9B64-FA60D9025DA9}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirCnC.Application", "AirCnC.Application\AirCnC.Application.csproj", "{0B64DE70-010D-45E0-AB4F-D0B0A70ADCA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirCnC.Application", "AirCnC.Application\AirCnC.Application.csproj", "{0B64DE70-010D-45E0-AB4F-D0B0A70ADCA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirCnC.Domain", "AirCnC.Domain\AirCnC.Domain.csproj", "{FF606310-22FE-471D-9B64-FA60D9025DA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirCnC.Domain", "AirCnC.Domain\AirCnC.Domain.csproj", "{FF606310-22FE-471D-9B64-FA60D9025DA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirCnC.Infrastructure", "AirCnC.Infrastructure\AirCnC.Infrastructure.csproj", "{311A194D-B745-4001-A3D5-25DD59982D0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirCnC.Infrastructure", "AirCnC.Infrastructure\AirCnC.Infrastructure.csproj", "{311A194D-B745-4001-A3D5-25DD59982D0B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7BC30DE1-3B7E-4CD3-8A03-C8B6017BBBF3}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,5 +41,8 @@ Global
 		{311A194D-B745-4001-A3D5-25DD59982D0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{311A194D-B745-4001-A3D5-25DD59982D0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{311A194D-B745-4001-A3D5-25DD59982D0B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

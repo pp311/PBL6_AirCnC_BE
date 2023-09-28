@@ -35,7 +35,8 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
             .HasConversion(
                 v => v.ToString(),
                 v => (PropertyType)Enum.Parse(typeof(PropertyType), v));
-        
+
+        builder.Property(Property => Property.CancellationPolicyId).IsRequired(false);
         builder.HasOne(p => p.CancellationPolicy)
             .WithMany(cp => cp.Properties)
             .HasForeignKey(p => p.CancellationPolicyId)
@@ -44,6 +45,11 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
         builder.HasOne(p => p.Host)
             .WithMany(h => h.Properties)
             .HasForeignKey(p => p.HostId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(p => p.PropertyImages)
+            .WithOne(pi => pi.Property)
+            .HasForeignKey(pi => pi.PropertyId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
