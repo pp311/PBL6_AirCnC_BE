@@ -12,6 +12,8 @@ public class PropertyImageConfiguration : IEntityTypeConfiguration<PropertyImage
         builder.Property(pi => pi.Url)
             .IsRequired()
             .HasMaxLength(StringLength.Url);
+        builder.Property(pi => pi.Id)
+            .ValueGeneratedOnAdd();
 
         builder.HasOne(pi => pi.Property)
             .WithMany(p => p.PropertyImages)
