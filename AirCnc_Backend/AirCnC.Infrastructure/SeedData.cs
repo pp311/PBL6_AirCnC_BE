@@ -80,7 +80,7 @@ public static class SeedData
             modelBuilder.Entity<Property>().HasData(property);
         }
         //seed property imgs
-        List<FakePropertyImgUrl> fakePropertyImgUrls = JsonSerializer.Deserialize<List<FakePropertyImgUrl>>(File.ReadAllText("..\\AirCnC.Infrastructure\\data.json"));
+        List<FakePropertyImgUrl> fakePropertyImgUrls = JsonSerializer.Deserialize<List<FakePropertyImgUrl>>(File.ReadAllText("../AirCnC.Infrastructure/data.json"));
         int IndexFakePropertyImgUrl = 0;
         int IndexPropertyImg = 0;
         List<PropertyImage> propertyImages = new List<PropertyImage>();

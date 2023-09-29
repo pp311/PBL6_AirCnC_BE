@@ -47,9 +47,5 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
             .HasForeignKey(p => p.HostId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.HasMany(p => p.PropertyImages)
-            .WithOne(pi => pi.Property)
-            .HasForeignKey(pi => pi.PropertyId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

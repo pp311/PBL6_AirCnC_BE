@@ -12,7 +12,7 @@ public class PropertyImageConfiguration : IEntityTypeConfiguration<PropertyImage
         builder.Property(pi => pi.Url)
             .IsRequired()
             .HasMaxLength(StringLength.Url);
-        builder.Property(pi => pi.PropertyId)
+        builder.Property(pi => pi.Id)
             .ValueGeneratedOnAdd();
 
         builder.HasOne(pi => pi.Property)
