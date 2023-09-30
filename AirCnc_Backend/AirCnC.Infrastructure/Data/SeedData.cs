@@ -1,18 +1,21 @@
+using System.Text.Json;
 using AirCnC.Domain.Constants;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Enums;
 using Bogus;
-using Bogus.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-namespace AirCnC.Infrastructure;
+
+namespace AirCnC.Infrastructure.Data;
 
 public static class SeedData
 {
     public class FakePropertyImgUrl
     {
+        // ReSharper disable once InconsistentNaming
         public string? tittle { get; set; } 
+        
+        // ReSharper disable once InconsistentNaming
         public List<string>? urlImgs { get; set; }
        
     }
@@ -46,11 +49,11 @@ public static class SeedData
                 modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> {RoleId = roles[1].Id, UserId = user.Id});
             }
         // seed hosts
-        var HostUsers = users;
+        var hostUsers = users;
         var hosts = new Faker<Host>()
             .RuleFor(h => h.UserId, f => {
-                var user = f.PickRandom(HostUsers);
-                HostUsers.Remove(user);
+                var user = f.PickRandom(hostUsers);
+                hostUsers.Remove(user);
                 return user.Id;
             })
             .RuleFor(h => h.Id, f => f.IndexFaker + 1)
@@ -80,23 +83,25 @@ public static class SeedData
             modelBuilder.Entity<Property>().HasData(property);
         }
         //seed property imgs
-        List<FakePropertyImgUrl> fakePropertyImgUrls = JsonSerializer.Deserialize<List<FakePropertyImgUrl>>(File.ReadAllText("../AirCnC.Infrastructure/data.json"));
-        int IndexFakePropertyImgUrl = 0;
-        int IndexPropertyImg = 0;
-        List<PropertyImage> propertyImages = new List<PropertyImage>();
+        List<FakePropertyImgUrl> fakePropertyImgUrls = JsonSerializer.Deserialize<List<FakePropertyImgUrl>>(File.ReadAllText("../AirCnC.Infrastructure/data.json")) 
+            ?? throw new Exception("Seed data file not found");
+        var indexFakePropertyImgUrl = 0;
+        var indexPropertyImg = 0;
+        var propertyImages = new List<PropertyImage>();
         foreach (var property in properties)
         {
-            for(int i = 0; i < fakePropertyImgUrls[IndexFakePropertyImgUrl].urlImgs.Count; i++)
+            foreach (var url in fakePropertyImgUrls[indexFakePropertyImgUrl].urlImgs!)
             {
                 propertyImages.Add(new PropertyImage
                 {
-                    Id = IndexPropertyImg + 1,
+                    Id = indexPropertyImg + 1,
                     PropertyId = property.Id,
-                    Url = fakePropertyImgUrls[IndexFakePropertyImgUrl].urlImgs[i]
+                    Url = url
                 });
-                IndexPropertyImg++;
+                indexPropertyImg++;
             }
-            IndexFakePropertyImgUrl++;
+
+            indexFakePropertyImgUrl++;
         }
 
 
