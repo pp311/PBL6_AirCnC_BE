@@ -19,7 +19,8 @@ builder.Services.AddDbContext(builder.Configuration)
     .ConfigureIdentity()
     .ConfigureConfigurations(builder.Configuration)
     .AddAuthentication(builder.Configuration)
-    .AddSwagger("AirCnC");
+    .AddSwagger("AirCnC")
+    .AddCloudinary(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(IApplicationAssemblyMarker));
 

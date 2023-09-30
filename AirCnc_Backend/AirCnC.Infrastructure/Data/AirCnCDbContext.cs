@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace AirCnC.Infrastructure;
+namespace AirCnC.Infrastructure.Data;
 
 public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
