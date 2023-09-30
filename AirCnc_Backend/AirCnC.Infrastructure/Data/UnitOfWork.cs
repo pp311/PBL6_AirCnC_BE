@@ -1,6 +1,6 @@
 using AirCnC.Domain.Data;
 
-namespace AirCnC.Infrastructure;
+namespace AirCnC.Infrastructure.Data;
 
 public class UnitOfWork : IUnitOfWork
 {

@@ -1,9 +1,9 @@
+using System.Linq.Dynamic.Core;
 using AirCnC.Domain.Entities.Base;
 using AirCnC.Domain.Specification;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
 
-namespace AirCnC.Infrastructure;
+namespace AirCnC.Infrastructure.Data;
 
 public static class GetQuery<TEntity> where TEntity : EntityBase
 {

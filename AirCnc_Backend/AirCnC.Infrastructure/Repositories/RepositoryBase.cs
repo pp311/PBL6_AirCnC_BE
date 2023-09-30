@@ -1,6 +1,7 @@
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities.Base;
 using AirCnC.Domain.Specification;
+using AirCnC.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AirCnC.Infrastructure.Repositories;

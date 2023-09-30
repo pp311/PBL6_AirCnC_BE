@@ -36,7 +36,7 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
                 v => v.ToString(),
                 v => (PropertyType)Enum.Parse(typeof(PropertyType), v));
 
-        builder.Property(Property => Property.CancellationPolicyId).IsRequired(false);
+        builder.Property(property => property.CancellationPolicyId).IsRequired(false);
         builder.HasOne(p => p.CancellationPolicy)
             .WithMany(cp => cp.Properties)
             .HasForeignKey(p => p.CancellationPolicyId)

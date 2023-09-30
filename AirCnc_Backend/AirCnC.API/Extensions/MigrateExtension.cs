@@ -1,4 +1,4 @@
-using AirCnC.Infrastructure;
+using AirCnC.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AirCnC.API.Extensions;
