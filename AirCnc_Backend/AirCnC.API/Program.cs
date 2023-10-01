@@ -21,7 +21,8 @@ builder.Services.AddDbContext(builder.Configuration)
     .AddAuthentication(builder.Configuration)
     .AddSwagger("AirCnC")
     .AddCloudinary(builder.Configuration)
-    .AddQuartz();
+    .AddQuartz()
+    .AddLogging(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(IApplicationAssemblyMarker));
 
