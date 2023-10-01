@@ -1,4 +1,5 @@
 using System.Text;
+using AirCnC.Application.BackgroundServices;
 using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.ImageUploader;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 
 namespace AirCnC.API.Extensions;
 
@@ -173,4 +175,27 @@ public static class ServiceExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddQuartz(this IServiceCollection services)
+    {
+        services.AddQuartz(options =>
+        {
+            var jobKey = JobKey.Create(nameof(TestJob));
+            options.AddJob<TestJob>(jobKey)
+                   .AddTrigger(trigger =>
+                        trigger.ForJob(jobKey)
+                            .WithSimpleSchedule(schedule =>
+                                schedule.WithIntervalInSeconds(5)
+                                        .RepeatForever()));
+        });
+
+        services.AddQuartzHostedService(options =>
+        {
+            options.AwaitApplicationStarted = true;
+            options.WaitForJobsToComplete = true;
+        });
+            
+        return services;
+    }
+    
 }
