@@ -2,11 +2,13 @@ using System.Text;
 using AirCnC.Application.BackgroundServices;
 using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Auth;
+using AirCnC.Application.Services.Email;
 using AirCnC.Application.Services.ImageUploader;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Infrastructure.Cloudinary;
 using AirCnC.Infrastructure.Data;
+using AirCnC.Infrastructure.Email;
 using AirCnC.Infrastructure.Repositories;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -90,6 +92,7 @@ public static class ServiceExtensions
     public static IServiceCollection ConfigureConfigurations(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<EmailSettings>(configuration.GetSection("EmailConfiguration"));
         return services;
     }
 
@@ -160,6 +163,12 @@ public static class ServiceExtensions
             });
         });
 
+        return services;
+    }
+    
+    public static IServiceCollection AddEmailSender(this IServiceCollection services)
+    {
+        services.AddScoped<IEmailSender, EmailSender>();
         return services;
     }
 

@@ -20,6 +20,7 @@ builder.Services.AddDbContext(builder.Configuration)
     .ConfigureConfigurations(builder.Configuration)
     .AddAuthentication(builder.Configuration)
     .AddSwagger("AirCnC")
+    .AddEmailSender()
     .AddCloudinary(builder.Configuration)
     .AddQuartz()
     .AddLogging(builder.Configuration);
