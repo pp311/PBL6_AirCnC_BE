@@ -77,5 +77,4 @@ public class AttachmentController : ControllerBase
         if (file.Length > 1024 * 1024 * 10)
             throw new MediaFileSizeLimitExceededException(10);
     }
-    
 }
