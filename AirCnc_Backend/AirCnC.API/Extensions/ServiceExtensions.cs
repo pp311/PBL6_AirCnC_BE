@@ -10,11 +10,15 @@ using AirCnC.Infrastructure.Data;
 using AirCnC.Infrastructure.Repositories;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace AirCnC.API.Extensions;
 
@@ -40,6 +44,9 @@ public static class ServiceExtensions
         {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             options.EnableSensitiveDataLogging();
+            // log loi chi tiet hon nhung lam giam hieu nang
+            options.EnableDetailedErrors();
+            // options.LogTo(new StreamWriter("./Logs/EFCore.log", true).WriteLine);
         });
         return services;
     }
@@ -197,5 +204,50 @@ public static class ServiceExtensions
             
         return services;
     }
-    
+
+    public static IServiceCollection AddLogging(this IServiceCollection services, IConfiguration configuration)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .WriteTo.Console(theme: SerilogCustomTheme.CustomTheme, 
+                restrictedToMinimumLevel: LogEventLevel.Information,
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>{NewLine}{Exception}")
+            .CreateLogger();
+        
+        services.AddHttpLogging(options =>
+        {
+            options.LoggingFields = HttpLoggingFields.RequestMethod |
+                                    HttpLoggingFields.RequestPath |
+                                    HttpLoggingFields.ResponseStatusCode;
+        });
+
+        return services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddSerilog(dispose: true);
+        }); 
+    }
+
+    private static class SerilogCustomTheme
+    {
+        public static SystemConsoleTheme CustomTheme { get; } = new( 
+            new Dictionary<ConsoleThemeStyle, SystemConsoleThemeStyle>
+            {
+                [ConsoleThemeStyle.Text] = new() { Foreground = ConsoleColor.White },
+                [ConsoleThemeStyle.SecondaryText] = new() { Foreground = ConsoleColor.Gray },
+                [ConsoleThemeStyle.TertiaryText] = new() { Foreground = ConsoleColor.DarkGray },
+                [ConsoleThemeStyle.Invalid] = new() { Foreground = ConsoleColor.Yellow },
+                [ConsoleThemeStyle.Null] = new() { Foreground = ConsoleColor.Blue },
+                [ConsoleThemeStyle.Name] = new() { Foreground = ConsoleColor.Gray },
+                [ConsoleThemeStyle.String] = new() { Foreground = ConsoleColor.Green },
+                [ConsoleThemeStyle.Number] = new() { Foreground = ConsoleColor.Magenta },
+                [ConsoleThemeStyle.Boolean] = new() { Foreground = ConsoleColor.Blue },
+                [ConsoleThemeStyle.Scalar] = new() { Foreground = ConsoleColor.Green },
+                [ConsoleThemeStyle.LevelVerbose] = new() { Foreground = ConsoleColor.Gray },
+                [ConsoleThemeStyle.LevelDebug] = new() { Foreground = ConsoleColor.Gray },
+                [ConsoleThemeStyle.LevelInformation] = new() { Foreground = ConsoleColor.Green },
+                [ConsoleThemeStyle.LevelWarning] = new() { Foreground = ConsoleColor.Yellow },
+                [ConsoleThemeStyle.LevelError] = new() { Foreground = ConsoleColor.White, Background = ConsoleColor.Red },
+                [ConsoleThemeStyle.LevelFatal] = new() { Foreground = ConsoleColor.White, Background = ConsoleColor.Red },
+            });
+    }
 }
