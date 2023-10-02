@@ -196,13 +196,13 @@ public static class ServiceExtensions
     {
         services.AddQuartz(options =>
         {
-            var jobKey = JobKey.Create(nameof(TestJob));
-            options.AddJob<TestJob>(jobKey)
-                   .AddTrigger(trigger =>
-                        trigger.ForJob(jobKey)
-                            .WithSimpleSchedule(schedule =>
-                                schedule.WithIntervalInSeconds(5)
-                                        .RepeatForever()));
+            
+            // options.AddJob<TestJob>(jobKey)
+            //        .AddTrigger(trigger =>
+            //             trigger.ForJob(jobKey)
+            //                 .WithSimpleSchedule(schedule =>
+            //                     schedule.WithIntervalInSeconds(5)
+            //                             .RepeatForever()));
         });
 
         services.AddQuartzHostedService(options =>
