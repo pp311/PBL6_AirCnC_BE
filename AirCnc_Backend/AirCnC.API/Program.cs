@@ -32,11 +32,8 @@ var app = builder.Build();
 await app.ApplyMigrationAsync(app.Logger);
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCustomExceptionHandler(app.Environment);
 

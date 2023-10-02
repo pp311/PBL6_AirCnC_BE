@@ -82,9 +82,21 @@ public static class SeedData
         {
             modelBuilder.Entity<Property>().HasData(property);
         }
+
+        List<FakePropertyImgUrl> fakePropertyImgUrls;
         //seed property imgs
-        List<FakePropertyImgUrl> fakePropertyImgUrls = JsonSerializer.Deserialize<List<FakePropertyImgUrl>>(File.ReadAllText("../AirCnC.Infrastructure/data.json")) 
-            ?? throw new Exception("Seed data file not found");
+        try
+        {
+            fakePropertyImgUrls =
+                JsonSerializer.Deserialize<List<FakePropertyImgUrl>>(
+                    File.ReadAllText("../AirCnC.Infrastructure/data.json"))
+                ?? throw new Exception("Seed data file not found");
+        }
+        catch
+        {
+            return;
+        }
+
         var indexFakePropertyImgUrl = 0;
         var indexPropertyImg = 0;
         var propertyImages = new List<PropertyImage>();

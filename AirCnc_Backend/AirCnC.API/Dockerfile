@@ -8,6 +8,7 @@ WORKDIR /src
 COPY ["AirCnC.API/AirCnC.API.csproj", "AirCnC.API/"]
 COPY ["AirCnC.Application/AirCnC.Application.csproj", "AirCnC.Application/"]
 COPY ["AirCnC.Domain/AirCnC.Domain.csproj", "AirCnC.Domain/"]
+COPY ["AirCnC.Infrastructure/AirCnC.Infrastructure.csproj", "AirCnC.Infrastructure/"]
 RUN dotnet restore "AirCnC.API/AirCnC.API.csproj"
 COPY . .
 WORKDIR "/src/AirCnC.API"
