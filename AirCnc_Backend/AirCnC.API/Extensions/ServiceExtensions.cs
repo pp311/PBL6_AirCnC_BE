@@ -233,6 +233,7 @@ public static class ServiceExtensions
         return services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.AddSerilog(dispose: true);
+            loggingBuilder.AddAzureWebAppDiagnostics();
         }); 
     }
 
