@@ -23,13 +23,13 @@ jobs:
           dotnet-version: '7.0.x'
 
       - name: Restore
-        run: dotnet restore ./AirCnC.API/AirCnC.API.csproj
+        run: dotnet restore ./AirCnc_Backend/AirCnc_Backend.sln
 
       - name: Build
-        run: dotnet build ./AirCnC.API/AirCnC.API.csproj -c Release --no-restore
+        run: dotnet build ./AirCnc_Backend/AirCnc_Backend.sln -c Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./AirCnC.API/AirCnC.API.csproj -c Release --no-build -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish ./AirCnc_Backend/AirCnc_Backend.sln -c Release --no-build -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
 
       - name: Deployment
         uses: azure/webapps-deploy@v2
