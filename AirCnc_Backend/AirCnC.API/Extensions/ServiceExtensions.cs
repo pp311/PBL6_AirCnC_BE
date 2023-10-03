@@ -21,6 +21,8 @@ using Quartz;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using AirCnC.Domain.Repositories;
+using AirCnC.Application.Services.Property;
 
 namespace AirCnC.API.Extensions;
 
@@ -30,6 +32,7 @@ public static class ServiceExtensions
     {
         services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPropertyRepository, PropertyRepository>();
         return services;
     }
 
@@ -37,6 +40,7 @@ public static class ServiceExtensions
     {
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IPropertyService, PropertyService>();
         return services;
     }
 
