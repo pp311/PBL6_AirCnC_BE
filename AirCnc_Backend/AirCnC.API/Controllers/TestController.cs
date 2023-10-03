@@ -21,4 +21,11 @@ public class TestController : ControllerBase
     {
         return Ok("Hello Admin");
     }
+    
+    [HttpGet("allow-anonymous")]
+    [AllowAnonymous]
+    public IActionResult GetAllowAnonymous()
+    {
+        return Ok("Hello Anonymous");
+    }
 }
