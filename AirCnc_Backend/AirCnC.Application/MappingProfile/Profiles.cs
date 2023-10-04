@@ -1,5 +1,5 @@
 using AirCnC.Application.Services.Auth.Dtos;
-using AirCnC.Application.Services.Property.Dtos;
+using AirCnC.Application.Services.PropertyService.Dtos;
 using AirCnC.Domain.Entities;
 using AutoMapper;
 

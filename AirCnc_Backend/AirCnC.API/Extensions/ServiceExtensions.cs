@@ -4,6 +4,7 @@ using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.Email;
 using AirCnC.Application.Services.ImageUploader;
+using AirCnC.Application.Services.PropertyService;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Infrastructure.Cloudinary;
@@ -21,8 +22,6 @@ using Quartz;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
-using AirCnC.Domain.Repositories;
-using AirCnC.Application.Services.Property;
 
 namespace AirCnC.API.Extensions;
 
@@ -32,7 +31,6 @@ public static class ServiceExtensions
     {
         services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IPropertyRepository, PropertyRepository>();
         return services;
     }
 
