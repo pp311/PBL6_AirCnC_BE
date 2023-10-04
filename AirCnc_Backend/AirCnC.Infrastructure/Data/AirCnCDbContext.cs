@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Entities.Base;
 using Microsoft.AspNetCore.Identity;
@@ -40,6 +41,19 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         modelBuilder.AddIdentitySeedData();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AirCnCDbContext).Assembly);
+        
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (!typeof(EntityBase).IsAssignableFrom(entityType.ClrType)) continue;
+            var parameter = Expression.Parameter(entityType.ClrType, "p");
+            var deletedCheck =
+                Expression.Lambda(
+                    Expression.Equal(Expression.Property(parameter, nameof(EntityBase.IsDeleted)), 
+                        Expression.Constant(false)),
+                    parameter);
+            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(deletedCheck);
+        }
+        
         base.OnModelCreating(modelBuilder);
     }
 
@@ -59,6 +73,7 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
                     // entry.Entity.CreatedBy = _currentUser.Id;
                     entry.Entity.CreatedAt = DateTime.UtcNow;
                     entry.Entity.LastModifiedAt = DateTime.UtcNow;
+                    entry.Entity.IsDeleted = false;
                     break;
 
                 case EntityState.Modified:
