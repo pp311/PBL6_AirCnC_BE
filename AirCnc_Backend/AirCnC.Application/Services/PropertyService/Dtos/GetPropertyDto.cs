@@ -1,8 +1,6 @@
-﻿using AirCnC.Domain.Entities;
-using AirCnC.Domain.Enums;
-using Newtonsoft.Json;
+﻿using AirCnC.Domain.Enums;
 
-namespace AirCnC.Application.Services.Property.Dtos
+namespace AirCnC.Application.Services.PropertyService.Dtos
 {
     public class GetPropertyDto
     {
@@ -17,6 +15,6 @@ namespace AirCnC.Application.Services.Property.Dtos
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public double PricePerNight { get; set; }
-        public ICollection<GetPropertyImageDto> ?PropertyImages { get; set; }
+        public ICollection<GetPropertyImageDto>? PropertyImages { get; set; }
     }
 }

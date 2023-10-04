@@ -1,7 +1,7 @@
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Specification;
 
-namespace AirCnC.Application.Specifications.Auth;
+namespace AirCnC.Application.Services.Auth.Specifications;
 
 public class RefreshTokenSpecification : Specification<RefreshToken>
 {
