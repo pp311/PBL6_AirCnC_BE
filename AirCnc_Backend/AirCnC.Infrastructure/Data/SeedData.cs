@@ -27,27 +27,27 @@ public static class SeedData
             modelBuilder.Entity<IdentityRole<int>>().HasData(role);
         }
             
-            var admin = GetAdmin();
-            modelBuilder.Entity<User>().HasData(admin);
-            modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> {RoleId = roles[0].Id, UserId = admin.Id});
+        var admin = GetAdmin();
+        modelBuilder.Entity<User>().HasData(admin);
+        modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> {RoleId = roles[0].Id, UserId = admin.Id});
             
-            var users = new Faker<User>()
-                // admin co id = 1 nen o day la 2
-                .RuleFor(u => u.Id, f => f.IndexFaker + 2)
-                .RuleFor(u => u.FullName, f => f.Name.FullName())
-                .RuleFor(u => u.Email, f => f.Internet.Email())
-                .RuleFor(u => u.NormalizedEmail, (_, u) => u.Email?.ToUpper())
-                .RuleFor(u => u.UserName, (_, u) => u.Email)
-                .RuleFor(u => u.NormalizedUserName, (_, u) => u.UserName?.ToUpper())
-                .RuleFor(u => u.SecurityStamp, _ => Guid.NewGuid().ToString())
-                .RuleFor(u => u.PasswordHash , _ => new PasswordHasher<User>().HashPassword(null!, "User@123"))
-                .Generate(10);
+        var users = new Faker<User>()
+            // admin co id = 1 nen o day la 2
+            .RuleFor(u => u.Id, f => f.IndexFaker + 2)
+            .RuleFor(u => u.FullName, f => f.Name.FullName())
+            .RuleFor(u => u.Email, f => f.Internet.Email())
+            .RuleFor(u => u.NormalizedEmail, (_, u) => u.Email?.ToUpper())
+            .RuleFor(u => u.UserName, (_, u) => u.Email)
+            .RuleFor(u => u.NormalizedUserName, (_, u) => u.UserName?.ToUpper())
+            .RuleFor(u => u.SecurityStamp, _ => Guid.NewGuid().ToString())
+            .RuleFor(u => u.PasswordHash , _ => new PasswordHasher<User>().HashPassword(null!, "User@123"))
+            .Generate(10);
     
-            foreach (var user in users)
-            {
-                modelBuilder.Entity<User>().HasData(user);
-                modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> {RoleId = roles[1].Id, UserId = user.Id});
-            }
+        foreach (var user in users)
+        {
+            modelBuilder.Entity<User>().HasData(user);
+            modelBuilder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> {RoleId = roles[1].Id, UserId = user.Id});
+        }
         // seed hosts
         var hostUsers = users;
         var hosts = new Faker<Host>()
@@ -68,6 +68,7 @@ public static class SeedData
             .RuleFor(p => p.HostId, f => f.PickRandom(hosts).Id)
             .RuleFor(p => p.Type, f => f.PickRandom<PropertyType>())
             .RuleFor(p => p.BedCount, f => f.Random.Number(1, 5))
+            .RuleFor(p => p.BedroomCount, f => f.Random.Number(1, 8))
             .RuleFor(p => p.BathroomCount, f => f.Random.Number(1, 3))
             .RuleFor(p => p.MaxAdultCount, f => f.Random.Number(1, 10))
             .RuleFor(p => p.MaxChildCount, f => f.Random.Number(1, 10))
@@ -75,6 +76,9 @@ public static class SeedData
             .RuleFor(p => p.Description, f => f.Lorem.Paragraph())
             .RuleFor(p => p.Latitude, f => f.Address.Latitude())
             .RuleFor(p => p.Longitude, f => f.Address.Longitude())
+            .RuleFor(p => p.Address, f => f.Address.StreetAddress())
+            .RuleFor(p => p.City, f => f.Address.City())
+            .RuleFor(p => p.CancellationPolicyType, f => f.PickRandom<CancellationPolicyType>())
             .RuleFor(p => p.PricePerNight, f => f.Random.Double(10, 100))
             .RuleFor(p => p.CleaningFee, f => f.Random.Double(10, 100))
             .Generate(30);
@@ -112,7 +116,6 @@ public static class SeedData
                 });
                 indexPropertyImg++;
             }
-
             indexFakePropertyImgUrl++;
         }
 

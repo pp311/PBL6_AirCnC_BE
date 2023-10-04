@@ -17,18 +17,5 @@
     <PackageReference Include="OAuth2" Version="0.10.3" />
     <PackageReference Include="Quartz" Version="3.7.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.0" />
-
-
-
-
-
-
-
-
-
   </ItemGroup>
-
-
-
-
 </Project>

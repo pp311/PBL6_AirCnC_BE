@@ -25,6 +25,14 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
             .HasPrecision(13, 10)
             .IsRequired();
         
+        builder.Property(p => p.Address)
+            .IsRequired()
+            .HasMaxLength(StringLength.Address);
+        
+        builder.Property(p => p.City)
+            .IsRequired()
+            .HasMaxLength(StringLength.City);
+        
         builder.Property(p => p.PricePerNight)
             .IsRequired();
         
@@ -36,11 +44,10 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
                 v => v.ToString(),
                 v => (PropertyType)Enum.Parse(typeof(PropertyType), v));
 
-        builder.Property(property => property.CancellationPolicyId).IsRequired(false);
-        builder.HasOne(p => p.CancellationPolicy)
-            .WithMany(cp => cp.Properties)
-            .HasForeignKey(p => p.CancellationPolicyId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(p => p.CancellationPolicyType)
+            .HasConversion(
+                v => v.ToString(),
+                v => (CancellationPolicyType)Enum.Parse(typeof(CancellationPolicyType), v));
 
         builder.HasOne(p => p.Host)
             .WithMany(h => h.Properties)
