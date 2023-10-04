@@ -1,6 +1,6 @@
+using AirCnC.Application.Services.PropertyService.Enums;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Enums;
-using AirCnC.Domain.Enums.Sorting;
 using AirCnC.Domain.Specification;
 
 namespace AirCnC.Application.Services.PropertyService.Specifications;

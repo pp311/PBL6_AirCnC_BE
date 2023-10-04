@@ -15,7 +15,6 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     public DbSet<Booking> Bookings { get; set; } = null!;
     public DbSet<Wishlist> Wishlists { get; set; } = null!;
     
-    public DbSet<CancellationPolicy> CancellationPolicies { get; set; } = null!;
     public DbSet<CancellationTicket> CancellationTickets { get; set; } = null!;
     public DbSet<CancellationTicketAttachment> CancellationTicketAttachments { get; set; } = null!;
     

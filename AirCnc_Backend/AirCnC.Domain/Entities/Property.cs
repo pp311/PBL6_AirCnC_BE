@@ -11,6 +11,7 @@ public class Property : EntityBase
     public PropertyType Type { get; set; }
     
     public int BedCount { get; set; }
+    public int BedroomCount { get; set; }
     public int BathroomCount { get; set; }
     public int MaxAdultCount { get; set; }
     public int MaxChildCount { get; set; }
@@ -20,12 +21,13 @@ public class Property : EntityBase
     
     public double Latitude { get; set; }
     public double Longitude { get; set; }
+    public string Address { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
     
     public double PricePerNight { get; set; }
     public double CleaningFee { get; set; }
     
-    public int? CancellationPolicyId { get; set; } = null;
-    public CancellationPolicy CancellationPolicy { get; set; } = null!;
+    public CancellationPolicyType CancellationPolicyType { get; set; }
     
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<PropertyImage> PropertyImages { get; set; } = new List<PropertyImage>();
