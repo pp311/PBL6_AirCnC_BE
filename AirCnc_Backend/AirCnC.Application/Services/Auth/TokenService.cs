@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AirCnC.Application.Commons;
-using AirCnC.Application.Specifications.Auth;
+using AirCnC.Application.Services.Auth.Specifications;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Exceptions;
