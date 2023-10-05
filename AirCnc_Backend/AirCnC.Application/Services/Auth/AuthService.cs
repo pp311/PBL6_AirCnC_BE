@@ -27,16 +27,19 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository<Guest> _guestRepository;
 
     public AuthService(ITokenService tokenService,
                        UserManager<User> userManager,
                        IMapper mapper,
-                       IUnitOfWork unitOfWork) 
+                       IUnitOfWork unitOfWork,
+                       IRepository<Guest> guestRepository) 
     {
         _tokenService = tokenService;
         _userManager = userManager;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
+        _guestRepository = guestRepository;
     }
     public async Task SignUpAsync(SignUpDto signUpDto)
     {
@@ -58,13 +61,19 @@ public class AuthService : IAuthService
         
         try
         {
+            // Create the user
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
             if (!result.Succeeded)
                 throw new UserCreateFailException(result.Errors.First().Description);   
             
+            // Add role to user
             var addRoleResult = await _userManager.AddToRoleAsync(user, AppRole.User);
             if (!addRoleResult.Succeeded)
                 throw new EntityNotFoundException("Role", AppRole.User);
+            
+            // Make user a guest
+            _guestRepository.Add(new Guest { Id = user.Id });
+            await _unitOfWork.SaveChangesAsync();
             
             await _unitOfWork.CommitTransactionAsync();
         }
@@ -170,6 +179,9 @@ public class AuthService : IAuthService
             var addRoleResult = await _userManager.AddToRoleAsync(user, AppRole.User);
             if (!addRoleResult.Succeeded)
                 throw new UserCreateFailException(result.Errors.First().Description);
+            
+            _guestRepository.Add(new Guest { Id = user.Id });
+            await _unitOfWork.SaveChangesAsync();
             
             await _unitOfWork.CommitTransactionAsync();
         }
