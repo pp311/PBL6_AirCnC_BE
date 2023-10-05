@@ -41,6 +41,7 @@ app.UseCustomExceptionHandler(app.Environment);
 
 // app.UseHttpsRedirection();
 
+app.UseCors("AirCnC");
 app.UseAuthentication();
 app.UseAuthorization();
 
