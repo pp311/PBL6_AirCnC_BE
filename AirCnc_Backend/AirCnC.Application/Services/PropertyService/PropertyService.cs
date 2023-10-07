@@ -32,11 +32,7 @@ namespace AirCnC.Application.Services.PropertyService
 
         public async Task<PagedList<GetPropertyDto>> GetListAsync(PropertyQueryParameters pqp)
         {
-            var propertyFilterSpec = new PropertyFilterSpecification(search: pqp.Search, type: pqp.Type, 
-                                                                    orderBy: pqp.OrderBy, 
-                                                                    isDescending: pqp.IsDescending,
-                                                                    pageIndex: pqp.PageIndex,
-                                                                    pageSize: pqp.PageSize);
+            var propertyFilterSpec = new PropertyFilterSpecification(pqp);
 
 
             var (items, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertyFilterSpec);
