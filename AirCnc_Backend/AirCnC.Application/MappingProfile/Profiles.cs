@@ -12,5 +12,9 @@ public class Profiles : Profile
         CreateMap<User, GetUserDto>();
         CreateMap<Property, GetPropertyDto>();
         CreateMap<PropertyImage, GetPropertyImageDto>();
+        CreateMap<PropertyUtility, GetPropertyUtilityDto>();
+        CreateMap<UpsertPropertyDto,Property>();
+        CreateMap<UpsertPropertyImageDto, PropertyImage>();
+        CreateMap<PropertyUtilityDto, PropertyUtility>();
     } 
 }
