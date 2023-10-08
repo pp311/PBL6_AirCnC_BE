@@ -22,6 +22,14 @@ namespace AirCnC.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateProperty([FromBody] UpsertPropertyDto upsertPropertyDto)
+        {
+            if (upsertPropertyDto is null)
+                return BadRequest();
+            var result = await _propertyService.CreateAsync(upsertPropertyDto);
+            return Ok(result);
+        }
 
     }
 }

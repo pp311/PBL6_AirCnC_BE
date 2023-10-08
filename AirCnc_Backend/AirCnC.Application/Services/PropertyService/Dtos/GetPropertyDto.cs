@@ -16,5 +16,6 @@ namespace AirCnC.Application.Services.PropertyService.Dtos
         public string? Description { get; set; }
         public double PricePerNight { get; set; }
         public ICollection<GetPropertyImageDto>? PropertyImages { get; set; }
+        public ICollection<GetPropertyUtilityDto>? PropertyUtilities { get; set; }
     }
 }

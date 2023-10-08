@@ -11,6 +11,7 @@ namespace AirCnC.Application.Services.PropertyService
     {
         Task<PagedList<GetPropertyDto>> GetListAsync(PropertyQueryParameters propertyQueryParameters);
         Task<GetPropertyDto?> GetByIdAsync(int id);
+        Task<GetPropertyDto> CreateAsync(UpsertPropertyDto upsertPropertyDto);
     }
     public class PropertyService : IPropertyService
     {
@@ -40,6 +41,16 @@ namespace AirCnC.Application.Services.PropertyService
             var result = _mapper.Map<List<GetPropertyDto>>(items);
             
             return new PagedList<GetPropertyDto>(result, totalCount, pqp.PageIndex, pqp.PageSize);
+        }
+
+        public async Task<GetPropertyDto> CreateAsync(UpsertPropertyDto upsertPropertyDto)
+        {
+            if(upsertPropertyDto is null) 
+                throw new ArgumentNullException(nameof(upsertPropertyDto));
+            Property property = _mapper.Map<Property>(upsertPropertyDto);
+            _propertyRepository.Add(property);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<GetPropertyDto>(property);
         }
     }
 }
