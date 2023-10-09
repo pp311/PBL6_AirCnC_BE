@@ -15,6 +15,10 @@ public class AttachmentController : ControllerBase
         _imageUploader = imageUploader;
     }
     
+    /// <summary>
+    /// Dùng để upload avatar, sẽ bị resize hoặc downgrade, chỉ cho phép file ảnh, dung lượng tối đa 5MB
+    /// </summary>
+    /// <remarks>Test bằng postman, với key là "file" (https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman)</remarks>
     [HttpPost("avatar")]
     public async Task<IActionResult> UploadAvatarImage([FromForm] IFormFile? file)
     {
@@ -27,6 +31,10 @@ public class AttachmentController : ControllerBase
         return Ok(url);
     }
     
+    /// <summary>
+    /// Dùng cho ảnh phòng, không bị resize nhưng max size 5MB, FE có thể tự check hoặc đợi response lỗi từ BE
+    /// </summary>
+    /// <remarks>Test bằng postman, với key là "file" (https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman)</remarks>
     [HttpPost("property")]
     public async Task<IActionResult> UploadPropertyImage([FromForm] IFormFile? file)
     {
@@ -39,6 +47,10 @@ public class AttachmentController : ControllerBase
         return Ok(url);
     }
     
+    /// <summary>
+    /// Dùng để upload ảnh hoặc video, hiện tại max size 10MB, dùng cho mấy cái phản hồi đòi cancel các thứ
+    /// </summary>
+    /// <remarks>Test bằng postman, với key là "file" (https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman)</remarks>
     [HttpPost("media")]
     public async Task<IActionResult> UploadMediaFile([FromForm] IFormFile? file)
     {

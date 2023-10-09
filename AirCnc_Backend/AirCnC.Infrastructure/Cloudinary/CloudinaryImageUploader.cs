@@ -1,4 +1,5 @@
 using AirCnC.Application.Services.ImageUploader;
+using AirCnC.Application.Services.ImageUploader.Dtos;
 using AirCnC.Domain.Exceptions.ImageUploader;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -18,7 +19,7 @@ public class CloudinaryImageUploader : IImageUploader
         _logger = logger;
     }
 
-    public async Task<string> UploadAvatarImageAsync(string fileName, Stream stream)
+    public async Task<MediaUrlDto> UploadAvatarImageAsync(string fileName, Stream stream)
     {
         var uploadParams = new ImageUploadParams()
         {
@@ -32,13 +33,13 @@ public class CloudinaryImageUploader : IImageUploader
 
         var result = await _cloudinary.UploadAsync(uploadParams);
         if (result.Error == null)
-            return result.Url.AbsoluteUri;
+            return new MediaUrlDto { Url = result.Url.AbsoluteUri };
 
         _logger.LogError("Upload file {name} to cloudinary failed: {error}", fileName, result.Error.Message);
         throw new UploadImageFailedException(result.Error!.Message);
     }
 
-    public async Task<string> UploadPropertyImageAsync(string fileName, Stream stream)
+    public async Task<MediaUrlDto> UploadPropertyImageAsync(string fileName, Stream stream)
     {
         var uploadParams = new ImageUploadParams()
         {
@@ -51,13 +52,13 @@ public class CloudinaryImageUploader : IImageUploader
 
         var result = await _cloudinary.UploadAsync(uploadParams);
         if (result.Error == null)
-            return result.Url.AbsoluteUri;
+            return new MediaUrlDto { Url = result.Url.AbsoluteUri };
 
         _logger.LogError("Upload file {name} to cloudinary failed: {error}", fileName, result.Error.Message);
         throw new UploadImageFailedException(result.Error!.Message);
     }
 
-    public async Task<string> UploadMediaFileAsync(string fileName, Stream stream)
+    public async Task<MediaUrlDto> UploadMediaFileAsync(string fileName, Stream stream)
     {
         var uploadParams = new RawUploadParams
         {
@@ -70,7 +71,7 @@ public class CloudinaryImageUploader : IImageUploader
 
         var result = await _cloudinary.UploadAsync(uploadParams);
         if (result.Error == null)
-            return result.Url.AbsoluteUri;
+            return new MediaUrlDto { Url = result.Url.AbsoluteUri };
 
         _logger.LogError("Upload file {name} to cloudinary failed: {error}", fileName, result.Error.Message);
         throw new UploadMediaFailedException(result.Error!.Message);
