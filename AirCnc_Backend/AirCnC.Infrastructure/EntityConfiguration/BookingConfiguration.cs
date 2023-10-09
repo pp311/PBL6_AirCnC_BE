@@ -24,6 +24,11 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
                 v => v.ToString(),
                 v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v));
         
+        builder.Property(b => b.CancellationPolicyType)
+            .HasConversion(
+                v => v.ToString(),
+                v => (CancellationPolicyType)Enum.Parse(typeof(CancellationPolicyType), v));
+        
         builder.Property(b => b.PricePerNight)
             .IsRequired();
         

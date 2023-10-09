@@ -1,7 +1,9 @@
+using System.Reflection;
 using System.Text;
 using AirCnC.Application.BackgroundServices;
 using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Auth;
+using AirCnC.Application.Services.BookingService;
 using AirCnC.Application.Services.Email;
 using AirCnC.Application.Services.ImageUploader;
 using AirCnC.Application.Services.PropertyService;
@@ -39,6 +41,7 @@ public static class ServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPropertyService, PropertyService>();
+        services.AddScoped<IBookingService, BookingService>();
         return services;
     }
 
@@ -95,6 +98,7 @@ public static class ServiceExtensions
     {
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.Configure<EmailSettings>(configuration.GetSection("EmailConfiguration"));
+        services.Configure<AirCnCSettings>(configuration.GetSection("AirCnC"));
         return services;
     }
 
@@ -163,6 +167,8 @@ public static class ServiceExtensions
                     Array.Empty<string>()
                 }
             });
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                config.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
 
         return services;

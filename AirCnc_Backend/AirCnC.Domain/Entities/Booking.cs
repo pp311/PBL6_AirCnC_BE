@@ -19,11 +19,13 @@ public class Booking : EntityBase
     public string? Note { get; set; }
     
     public BookingStatus Status { get; set; }
-    
+   
+    // Copy may cai nay tu property qua nhu la snapshot, tranh truong hop thong tin property thay doi sau nay
     public double PricePerNight { get; set; }
     public double CleaningFee { get; set; }
     public double SystemFee { get; set; }
     public double TotalPrice { get; set; }
+    public CancellationPolicyType CancellationPolicyType { get; set; }
     
     public int? CancellationTicketId { get; set; }
     public CancellationTicket? CancellationTicket { get; set; }

@@ -32,6 +32,9 @@ public class AuthController : ControllerBase
 		return Ok(result);
 	}
         
+	/// <summary>
+	/// Dùng để refresh token, khi token hết hạn thì dùng refresh token để lấy access token và refresh token mới
+	/// </summary>
 	[HttpPost("refresh-token")]
 	public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
 	{
@@ -39,6 +42,9 @@ public class AuthController : ControllerBase
 		return Ok(result);
 	}
 	
+	/// <summary>
+	/// Dùng để logout, khi logout thì sẽ xóa refresh token
+	/// </summary>
 	[HttpPost("refresh-token/revoke")]
 	public async Task<IActionResult> RevokeRefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
 	{
@@ -46,6 +52,9 @@ public class AuthController : ControllerBase
 		return Ok();
 	}
 	
+	/// <summary>
+	/// Khi đăng nhập bằng google sẽ có access token của google trả về, dùng AC đó thay cho password để đăng nhập, nếu chưa có tài khoản thì sẽ tạo mới
+	/// </summary>
 	[HttpPost("google-login")]
 	public async Task<IActionResult> GoogleLoginAsync(ExternalAuthDto dto)
 	{
