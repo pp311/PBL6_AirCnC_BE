@@ -45,4 +45,6 @@ public class PropertyQueryParameters : PagingParameters
     public int AdultCount { get; set; } = 0;
     [Range(0, 64)]
     public int ChildCount { get; set; } = 0;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public PropertyStatus? Status { get; set; }
 }

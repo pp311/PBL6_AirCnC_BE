@@ -58,5 +58,10 @@ namespace AirCnC.Application.Services.PropertyService.Dtos
         //public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
         [Required]
         public ICollection<PropertyUtilityDto> PropertyUtilities { get; set; } = new List<PropertyUtilityDto>();
+        [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [EnumDataType(typeof(PropertyStatus))]
+        public PropertyStatus Status { get; set; } = PropertyStatus.Pending;
+        public string? RejectionReason { get; set; }
     }
 }

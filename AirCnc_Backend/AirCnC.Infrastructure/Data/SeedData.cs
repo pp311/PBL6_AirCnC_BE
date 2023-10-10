@@ -13,7 +13,7 @@ public static class SeedData
     public class FakePropertyImgUrl
     {
         // ReSharper disable once InconsistentNaming
-        public string? tittle { get; set; } 
+        public string? tittle { get; set; }
         
         // ReSharper disable once InconsistentNaming
         public List<string>? urlImgs { get; set; }
@@ -50,6 +50,8 @@ public static class SeedData
 
         var bookings = GetBookings(properties, users);
         modelBuilder.Entity<Booking>().HasData(bookings);
+        var propertyUtilities = GetPropertyUtility();
+        modelBuilder.Entity<PropertyUtility>().HasData(propertyUtilities);
     }
 
     private static List<Booking> GetBookings(List<Property> properties,
@@ -154,6 +156,7 @@ public static class SeedData
             .RuleFor(p => p.CancellationPolicyType, f => f.PickRandom<CancellationPolicyType>())
             .RuleFor(p => p.PricePerNight, f => f.Random.Double(10, 100))
             .RuleFor(p => p.CleaningFee, f => f.Random.Double(10, 100))
+            .RuleFor(p => p.Status, f => f.PickRandom<PropertyStatus>())
             .Generate(30);
     }
 
@@ -196,5 +199,35 @@ public static class SeedData
             SecurityStamp = Guid.NewGuid().ToString(),
             PasswordHash = new PasswordHasher<User>().HashPassword(null!, "Admin@123")
         };
+    }
+
+    private static List<PropertyUtility> GetPropertyUtility()
+    {
+        return new Faker<PropertyUtility>()
+            .RuleFor(pu => pu.Id, f => f.IndexFaker + 1)
+            .RuleFor(pu=>pu.IsAirConditioning,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsWifi,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsTv,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsKitchen,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsAirConditioning,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsLaptopFriendlyWorkspace,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsHotWater,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsBreakfast,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsRoomService,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsBar,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsSwimmingPool,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsGym,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsSpa,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsBeachFront,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsMountainView,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsLakeView,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsSeaView,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsLandmarkView,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsWheelchairAccessible,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsElevator,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsSecurityCamera,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.IsCamperFriendly,f=>f.Random.Bool())
+            .RuleFor(pu=>pu.PropertyId,f=>f.IndexFaker+1)
+            .Generate(30);
     }
 }
