@@ -31,6 +31,7 @@ public class PropertyFilterSpecification : Specification<Property>
         FilterByDateRange(pqp);
 
         FilterByGuestCount(pqp);
+        FilterByStatus(pqp);
 
         // Order by
         if (pqp.OrderBy is not null)
@@ -88,5 +89,11 @@ public class PropertyFilterSpecification : Specification<Property>
             AddFilter(p => p.PricePerNight >= pqp.MinPrice);
         if (pqp.MaxPrice > 0)
             AddFilter(p => p.PricePerNight <= pqp.MaxPrice);
+    }
+
+    private void FilterByStatus(PropertyQueryParameters pqp)
+    {
+        if (pqp.Status is not null)
+            AddFilter(p => p.Status == pqp.Status);
     }
 }

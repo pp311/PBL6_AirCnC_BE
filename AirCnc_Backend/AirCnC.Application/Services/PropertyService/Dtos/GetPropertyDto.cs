@@ -17,5 +17,7 @@ namespace AirCnC.Application.Services.PropertyService.Dtos
         public double PricePerNight { get; set; }
         public ICollection<GetPropertyImageDto>? PropertyImages { get; set; }
         public ICollection<GetPropertyUtilityDto>? PropertyUtilities { get; set; }
+        public PropertyStatus Status { get; set; } = PropertyStatus.Pending;
+        public string? RejectionReason { get; set; }
     }
 }
