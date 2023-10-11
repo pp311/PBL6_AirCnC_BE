@@ -33,7 +33,7 @@ public class AuthService : IAuthService
                        UserManager<User> userManager,
                        IMapper mapper,
                        IUnitOfWork unitOfWork,
-                       IRepository<Guest> guestRepository) 
+                       IRepository<Guest> guestRepository)
     {
         _tokenService = tokenService;
         _userManager = userManager;
@@ -49,7 +49,7 @@ public class AuthService : IAuthService
         var isUsernameExisted = await _userManager.FindByNameAsync(signUpDto.Username) != null;
         if (isUsernameExisted)
             throw new UsernameAlreadyExistException(signUpDto.Username);
-        
+
         var user = new User
         {
             FullName = signUpDto.FullName,
@@ -58,23 +58,23 @@ public class AuthService : IAuthService
         };
 
         await _unitOfWork.BeginTransactionAsync();
-        
+
         try
         {
             // Create the user
             var result = await _userManager.CreateAsync(user, signUpDto.Password);
             if (!result.Succeeded)
-                throw new UserCreateFailException(result.Errors.First().Description);   
-            
+                throw new UserCreateFailException(result.Errors.First().Description);
+
             // Add role to user
             var addRoleResult = await _userManager.AddToRoleAsync(user, AppRole.User);
             if (!addRoleResult.Succeeded)
                 throw new EntityNotFoundException("Role", AppRole.User);
-            
+
             // Make user a guest
-            _guestRepository.Add(new Guest { Id = user.Id });
+            _guestRepository.Add(new Guest { UserId = user.Id });
             await _unitOfWork.SaveChangesAsync();
-            
+
             await _unitOfWork.CommitTransactionAsync();
         }
         catch
@@ -89,17 +89,17 @@ public class AuthService : IAuthService
         var refreshTokenEntity = await _tokenService.ValidateRefreshTokenAsync(refreshTokenDto.RefreshToken);
 
         var user = await _userManager.FindByIdAsync(refreshTokenEntity.UserId.ToString());
-        
+
         var tokenDto = new TokenDto
         {
             AccessToken = await _tokenService.GenerateAccessTokenAsync(user!.Id),
             RefreshToken = _tokenService.GenerateRefreshToken()
         };
-        
+
         await _tokenService.RevokeRefreshTokenAsync(refreshTokenDto.RefreshToken);
-        
+
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
-        
+
         return tokenDto;
     }
 
@@ -111,18 +111,18 @@ public class AuthService : IAuthService
             HttpClientInitializer = GoogleCredential.FromAccessToken(dto.AccessToken),
             ApplicationName = "AirCnC"
         }).Userinfo.Get().ExecuteAsync();
-        
+
         var user = await GetOrCreateUserAsync(userInfo);
-        
+
         var tokenDto = new TokenDto
         {
             AccessToken = await _tokenService.GenerateAccessTokenAsync(user.Id),
             RefreshToken = _tokenService.GenerateRefreshToken(),
             User = _mapper.Map<GetUserDto>(user)
         };
-        
+
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
-        
+
         return tokenDto;
     }
 
@@ -130,14 +130,14 @@ public class AuthService : IAuthService
     {
         var user = await _userManager.FindByNameAsync(logInDto.Identifier)
                    ?? await _userManager.FindByEmailAsync(logInDto.Identifier);
-        
+
         if (user == null)
             throw new UserNotFoundException(logInDto.Identifier);
-        
+
         var isValid = await _userManager.CheckPasswordAsync(user, logInDto.Password);
         if (!isValid)
             throw new InvalidPasswordException();
-        
+
         var userDto = _mapper.Map<GetUserDto>(user);
 
         var tokenDto = new TokenDto
@@ -146,9 +146,9 @@ public class AuthService : IAuthService
             RefreshToken = _tokenService.GenerateRefreshToken(),
             User = userDto
         };
-        
+
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
-        
+
         return tokenDto;
     }
 
@@ -156,7 +156,7 @@ public class AuthService : IAuthService
     {
         var user = await _userManager.FindByEmailAsync(payload.Email);
         if (user != null) return user;
-        
+
         user = new User
         {
             Email = payload.Email,
@@ -179,18 +179,18 @@ public class AuthService : IAuthService
             var addRoleResult = await _userManager.AddToRoleAsync(user, AppRole.User);
             if (!addRoleResult.Succeeded)
                 throw new UserCreateFailException(result.Errors.First().Description);
-            
+
             _guestRepository.Add(new Guest { Id = user.Id });
             await _unitOfWork.SaveChangesAsync();
-            
+
             await _unitOfWork.CommitTransactionAsync();
         }
         catch
         {
             await _unitOfWork.RollbackAsync();
-            throw; 
+            throw;
         }
-        
-        return user; 
+
+        return user;
     }
 }
