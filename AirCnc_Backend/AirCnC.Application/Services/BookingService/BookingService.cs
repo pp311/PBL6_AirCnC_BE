@@ -7,6 +7,7 @@ using AirCnC.Domain.Enums;
 using AirCnC.Domain.Exceptions;
 using AirCnC.Domain.Exceptions.BookingException;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace AirCnC.Application.Services.BookingService;
@@ -29,19 +30,22 @@ public class BookingService : IBookingService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly AirCnCSettings _airCnCSettings;
+    private readonly ILogger<BookingService> _logger;
 
     public BookingService(IRepository<Booking> bookingRepository,
                           IUnitOfWork unitOfWork,
                           IMapper mapper,
                           IRepository<Property> propertyRepository,
                           IOptions<AirCnCSettings> airCnCSettings,
-                          IRepository<Guest> guestRepository)
+                          IRepository<Guest> guestRepository,
+                          ILogger<BookingService> logger)
     {
         _bookingRepository = bookingRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _propertyRepository = propertyRepository;
         _guestRepository = guestRepository;
+        _logger = logger;
         _airCnCSettings = airCnCSettings.Value;
     }
 
@@ -68,7 +72,7 @@ public class BookingService : IBookingService
     public async Task<GetDraftBookingDto> CreateBookingAsync(CreateBookingDto createBookingDto)
     {
         // Get property info
-        var propertyInfo = await _propertyRepository.GetByIdAsync(createBookingDto.PropertyId)
+        var propertyInfo = await _propertyRepository.FindOneAsync(new GetPropertyWithHostSpecification(createBookingDto.PropertyId))
                            ?? throw new EntityNotFoundException(nameof(Property), createBookingDto.PropertyId.ToString());
 
         // Validate input
@@ -139,8 +143,8 @@ public class BookingService : IBookingService
             throw new InvalidBookingDateException($"Stay duration must be less than {_airCnCSettings.MaxStayDuration} days");
 
         // Check if property is available for booking
-        var isPropertyAvailable = await _bookingRepository.AnyAsync(new ActiveBookingBetweenDatesSpecification(createBookingDto.CheckInDate, createBookingDto.CheckOutDate));
-        if (!isPropertyAvailable)
+        var isPropertyAlreadyBusy = await _bookingRepository.AnyAsync(new ActiveBookingBetweenDatesSpecification(createBookingDto.CheckInDate, createBookingDto.CheckOutDate));
+        if (isPropertyAlreadyBusy)
             throw new InvalidBookingDateException("Property is not available for booking");
 
         // Check if number of guests is valid
