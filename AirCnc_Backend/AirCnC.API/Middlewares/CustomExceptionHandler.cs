@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using AirCnC.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,15 +18,15 @@ public static class CustomExceptionHandler
                     var response = context.Response;
                     response.ContentType = "application/json";
                     var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-                    var message = exception?.Message;
-    
-                    switch (exception)
+                    var message = $"{exception!.GetType().Name}: {exception.Message}";
+
+                    response.StatusCode = exception switch
                     {
-                        default:
-                            response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                            break;
-                    }
-    
+                        EntityNotFoundException => (int)HttpStatusCode.NotFound,
+                        BadInputException => (int)HttpStatusCode.BadRequest,
+                        _ => (int)HttpStatusCode.InternalServerError
+                    };
+
                     var isDevelopment = env.IsDevelopment();
     
                     var pd = new ProblemDetails
