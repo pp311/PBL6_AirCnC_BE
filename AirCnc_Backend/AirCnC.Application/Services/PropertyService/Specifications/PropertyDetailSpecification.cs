@@ -1,4 +1,3 @@
-using AirCnC.Application.Services.PropertyService.Dtos;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Specification;
 
@@ -10,7 +9,6 @@ public class PropertyDetailSpecification : Specification<Property>
     {
         AddInclude(p => p.PropertyImages);
         AddInclude(p => p.PropertyUtilities);
-        AddFilter(p=>p.Id==id);
+        AddFilter(p => p.Id == id);
     }
-
 }
