@@ -33,7 +33,7 @@ public static class CustomExceptionHandler
                     {
                         Title = isDevelopment ? message : "An error occurred on the server.",
                         Status = response.StatusCode,
-                        Detail = isDevelopment ? exception?.StackTrace : null
+                        Detail = isDevelopment ? exception.StackTrace : null
                         // Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
                     };
     

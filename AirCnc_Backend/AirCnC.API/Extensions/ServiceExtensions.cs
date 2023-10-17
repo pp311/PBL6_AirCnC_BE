@@ -1,7 +1,8 @@
 using System.Reflection;
 using System.Text;
-using AirCnC.Application.BackgroundServices;
+using AirCnC.API.Common.Identity;
 using AirCnC.Application.Commons;
+using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.BookingService;
 using AirCnC.Application.Services.Email;
@@ -60,6 +61,7 @@ public static class ServiceExtensions
 
     public static IServiceCollection AddCurrentUser(this IServiceCollection services)
     {
+        services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddHttpContextAccessor();
         return services;
     }

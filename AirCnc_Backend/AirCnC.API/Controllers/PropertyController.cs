@@ -1,5 +1,6 @@
 ﻿using AirCnC.Application.Services.PropertyService;
 using AirCnC.Application.Services.PropertyService.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers
@@ -23,11 +24,12 @@ namespace AirCnC.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProperty([FromBody] UpsertPropertyDto upsertPropertyDto,int userId)
+        [Authorize]
+        public async Task<IActionResult> CreateProperty([FromBody] UpsertPropertyDto? upsertPropertyDto)
         {
             if (upsertPropertyDto is null)
                 return BadRequest();
-            var result = await _propertyService.CreateAsync(upsertPropertyDto,userId);
+            var result = await _propertyService.CreateAsync(upsertPropertyDto);
             return Ok(result);
         }
 
@@ -50,7 +52,7 @@ namespace AirCnC.API.Controllers
         }
 
         [HttpPut("{propertyId:int}")]
-        public async Task<IActionResult> UpdateProperty(int propertyId, [FromBody] UpsertPropertyDto upsertPropertyDto)
+        public async Task<IActionResult> UpdateProperty(int propertyId, [FromBody] UpsertPropertyDto? upsertPropertyDto)
         {
             if (upsertPropertyDto is null)
                 return BadRequest();
