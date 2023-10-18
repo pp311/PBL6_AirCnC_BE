@@ -6,6 +6,7 @@ using AirCnC.Application.Services.PropertyService.Specifications;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Enums;
+using AirCnC.Domain.Exceptions;
 using AutoMapper;
 
 namespace AirCnC.Application.Services.PropertyService;
@@ -17,6 +18,8 @@ public interface IPropertyService
     Task<GetPropertyDto> CreateAsync(UpsertPropertyDto upsertPropertyDto);
     Task<GetPropertyDto?> DeleteByIdAsync(int id);
     Task<GetPropertyDto?> UpdateAsync(int id, UpsertPropertyDto upsertPropertyDto);
+    Task ConfirmCreatePropertyRequest(int propertyId);
+    Task RejectCreatePropertyRequest(int propertyId, RejectPropertyRequestDto dto);
 }
 
 public class PropertyService : IPropertyService
@@ -105,5 +108,24 @@ public class PropertyService : IPropertyService
         _mapper.Map(upsertPropertyDto, property);
         await _unitOfWork.SaveChangesAsync();
         return _mapper.Map<GetPropertyDto>(property);
+    }
+
+    public async Task ConfirmCreatePropertyRequest(int propertyId)
+    {
+        var property = await _propertyRepository.GetByIdAsync(propertyId)
+            ?? throw new EntityNotFoundException(nameof(Property), propertyId.ToString());
+
+        property.Status = PropertyStatus.Approved;
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task RejectCreatePropertyRequest(int propertyId, RejectPropertyRequestDto dto)
+    {
+        var property = await _propertyRepository.GetByIdAsync(propertyId)
+            ?? throw new EntityNotFoundException(nameof(Property), propertyId.ToString());
+
+        property.Status = PropertyStatus.Rejected;
+        property.RejectionReason = dto.Reason;
+        await _unitOfWork.SaveChangesAsync();
     }
 }

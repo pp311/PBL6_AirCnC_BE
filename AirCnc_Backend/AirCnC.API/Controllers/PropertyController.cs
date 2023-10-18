@@ -61,5 +61,19 @@ namespace AirCnC.API.Controllers
                 return NotFound();
             return Ok(result);
         }
+        
+        [HttpPost("{propertyId:int}/confirm")]
+        public async Task<IActionResult> ConfirmCreatePropertyRequest(int propertyId)
+        {
+            await _propertyService.ConfirmCreatePropertyRequest(propertyId);
+            return NoContent();
+        }
+        
+        [HttpPost("{propertyId:int}/reject")]
+        public async Task<IActionResult> RejectCreatePropertyRequest(int propertyId, RejectPropertyRequestDto dto)
+        {
+            await _propertyService.RejectCreatePropertyRequest(propertyId, dto);
+            return NoContent();
+        }
     }
 }

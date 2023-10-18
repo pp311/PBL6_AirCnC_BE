@@ -34,6 +34,6 @@ public class Property : EntityBase
     public ICollection<PropertyReview> PropertyReviews { get; set; } = new List<PropertyReview>();
     public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
     public ICollection<PropertyUtility> PropertyUtilities { get; set; } = new List<PropertyUtility>();
-    public PropertyStatus Status { get; set; } = PropertyStatus.Pending;
+    public PropertyStatus Status { get; set; }
     public string? RejectionReason { get; set; }
 }
