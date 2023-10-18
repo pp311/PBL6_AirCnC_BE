@@ -15,7 +15,7 @@ namespace AirCnC.Application.Services.Auth;
 
 public interface IAuthService
 {
-    Task<TokenDto> LoginAsync(LoginDto logInDto);
+    Task<TokenDto> LoginAsync(LoginDto logInDto, string role);
     Task SignUpAsync(SignUpDto signUpDto);
     Task<TokenDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
     Task<TokenDto> GoogleAuthenticateAsync(ExternalAuthDto dto);
@@ -126,13 +126,23 @@ public class AuthService : IAuthService
         return tokenDto;
     }
 
-    public async Task<TokenDto> LoginAsync(LoginDto logInDto)
+    public async Task<TokenDto> LoginAsync(LoginDto logInDto, string role)
     {
         var user = await _userManager.FindByNameAsync(logInDto.Identifier)
                    ?? await _userManager.FindByEmailAsync(logInDto.Identifier);
 
         if (user == null)
             throw new UserNotFoundException(logInDto.Identifier);
+
+        var isAdmin = await _userManager.IsInRoleAsync(user, AppRole.Admin);
+        switch (role)
+        {
+            case AppRole.Admin when !isAdmin:
+                throw new UserNotFoundException(logInDto.Identifier);
+            case AppRole.User when isAdmin:
+                throw new UserNotFoundException(logInDto.Identifier);
+        }
+
 
         var isValid = await _userManager.CheckPasswordAsync(user, logInDto.Password);
         if (!isValid)
@@ -146,7 +156,7 @@ public class AuthService : IAuthService
             RefreshToken = _tokenService.GenerateRefreshToken(),
             User = userDto
         };
-
+        
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
 
         return tokenDto;

@@ -1,9 +1,11 @@
+using AirCnC.Domain.Entities;
+
 namespace AirCnC.Domain.Exceptions.Auth;
 
-public class UsernameAlreadyExistException : Exception
+public class UsernameAlreadyExistException : EntityAlreadyExistedException
 {
     public UsernameAlreadyExistException(string username)
-        : base($"Username ({username}) was already existed.")
+        : base(nameof(User), username)
     {
     }
 }
