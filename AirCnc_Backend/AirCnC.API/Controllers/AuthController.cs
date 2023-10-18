@@ -1,5 +1,6 @@
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.Auth.Dtos;
+using AirCnC.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers;
@@ -25,10 +26,17 @@ public class AuthController : ControllerBase
 		return Ok();
 	}
         
-	[HttpPost("log-in")]
+	[HttpPost("admin/log-in")]
 	public async Task<IActionResult> Login([FromBody] LoginDto logInDto)
 	{
-		var result = await _authenticateService.LoginAsync(logInDto);
+		var result = await _authenticateService.LoginAsync(logInDto, AppRole.Admin);
+		return Ok(result);
+	}
+	
+	[HttpPost("user/log-in")]
+	public async Task<IActionResult> UserLogin([FromBody] LoginDto logInDto)
+	{
+		var result = await _authenticateService.LoginAsync(logInDto, AppRole.User);
 		return Ok(result);
 	}
         

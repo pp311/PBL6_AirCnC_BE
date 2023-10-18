@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using AirCnC.Domain.Exceptions;
+using AirCnC.Domain.Exceptions.Auth;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,12 +19,14 @@ public static class CustomExceptionHandler
                     var response = context.Response;
                     response.ContentType = "application/json";
                     var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-                    var message = $"{exception!.GetType().Name}: {exception.Message}";
 
                     response.StatusCode = exception switch
                     {
                         EntityNotFoundException => (int)HttpStatusCode.NotFound,
                         BadInputException => (int)HttpStatusCode.BadRequest,
+                        EntityAlreadyExistedException => (int)HttpStatusCode.Conflict,
+                        RefreshTokenExpiredException => (int)HttpStatusCode.Unauthorized,
+                        InvalidPasswordException => (int)HttpStatusCode.Unauthorized,
                         _ => (int)HttpStatusCode.InternalServerError
                     };
 
@@ -31,9 +34,9 @@ public static class CustomExceptionHandler
     
                     var pd = new ProblemDetails
                     {
-                        Title = isDevelopment ? message : "An error occurred on the server.",
+                        Title = exception!.GetType().Name,
                         Status = response.StatusCode,
-                        Detail = isDevelopment ? exception.StackTrace : null
+                        Detail = isDevelopment ? $"{exception.Message} -{exception.StackTrace}" : exception.Message
                         // Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
                     };
     

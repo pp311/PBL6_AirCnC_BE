@@ -1,9 +1,8 @@
 namespace AirCnC.Domain.Exceptions.Auth;
 
-public class EmailAlreadyExistException : Exception
+public class EmailAlreadyExistException : EntityAlreadyExistedException
 {
-    public EmailAlreadyExistException(string email)
-        : base($"Email ({email}) was already existed.")
+    public EmailAlreadyExistException(string email) : base("Email", email)
     {
     }
 }
