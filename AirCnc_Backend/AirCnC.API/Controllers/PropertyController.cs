@@ -1,5 +1,5 @@
-﻿using AirCnC.Application.Services.PropertyService;
-using AirCnC.Application.Services.PropertyService.Dtos;
+﻿using AirCnC.Application.Services.Properties;
+using AirCnC.Application.Services.Properties.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

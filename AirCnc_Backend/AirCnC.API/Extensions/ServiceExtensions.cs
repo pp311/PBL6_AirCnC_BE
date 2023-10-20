@@ -4,10 +4,12 @@ using AirCnC.API.Common.Identity;
 using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Services.Auth;
-using AirCnC.Application.Services.BookingService;
+using AirCnC.Application.Services.Bookings;
 using AirCnC.Application.Services.Email;
+using AirCnC.Application.Services.Guests;
+using AirCnC.Application.Services.Hosts;
 using AirCnC.Application.Services.ImageUploader;
-using AirCnC.Application.Services.PropertyService;
+using AirCnC.Application.Services.Properties;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Infrastructure.Cloudinary;
@@ -43,6 +45,8 @@ public static class ServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPropertyService, PropertyService>();
         services.AddScoped<IBookingService, BookingService>();
+        services.AddScoped<IHostService, HostService>();
+        services.AddScoped<IGuestService, GuestService>();
         return services;
     }
 

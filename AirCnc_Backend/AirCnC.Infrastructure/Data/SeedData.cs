@@ -170,6 +170,12 @@ public static class SeedData
             .RuleFor(u => u.NormalizedEmail, (_, u) => u.Email?.ToUpper())
             .RuleFor(u => u.UserName, (_, u) => u.Email)
             .RuleFor(u => u.NormalizedUserName, (_, u) => u.UserName?.ToUpper())
+            .RuleFor(u => u.Address, f => f.Address.StreetAddress())
+            .RuleFor(u => u.City, f => f.Address.City())
+            .RuleFor(u => u.PhoneNumber, f => f.Phone.PhoneNumber())
+            .RuleFor(u => u.Introduction, f => f.Lorem.Paragraph())
+            .RuleFor(u => u.AvatarUrl, f => f.Image.PicsumUrl())
+            .RuleFor(u => u.EmailConfirmed, _ => true)
             .RuleFor(u => u.SecurityStamp, _ => Guid.NewGuid().ToString())
             .RuleFor(u => u.PasswordHash , _ => new PasswordHasher<User>().HashPassword(null!, "User@123"))
             .Generate(10);

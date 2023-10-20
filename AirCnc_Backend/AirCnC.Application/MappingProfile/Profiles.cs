@@ -1,6 +1,8 @@
 using AirCnC.Application.Services.Auth.Dtos;
-using AirCnC.Application.Services.BookingService.Dtos;
-using AirCnC.Application.Services.PropertyService.Dtos;
+using AirCnC.Application.Services.Bookings.Dtos;
+using AirCnC.Application.Services.Guests.Dtos;
+using AirCnC.Application.Services.Hosts.Dtos;
+using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Domain.Entities;
 using AutoMapper;
 
@@ -11,6 +13,23 @@ public class Profiles : Profile
     public Profiles()
     {
         CreateMap<User, GetUserDto>();
+
+        CreateMap<Host, GetHostDto>()
+            .ForMember(dto => dto.Name, opt => opt.MapFrom(h => h.User.FullName))
+            .ForMember(dto => dto.Introduction, opt => opt.MapFrom(h => h.User.Introduction))
+            .ForMember(dto => dto.AvatarUrl, opt => opt.MapFrom(h => h.User.AvatarUrl))
+            .ForMember(dto => dto.Address, opt => opt.MapFrom(h => h.User.Address))
+            .ForMember(dto => dto.City, opt => opt.MapFrom(h => h.User.City))
+            .ForMember(dto => dto.JoinedAt, opt => opt.MapFrom(h => h.CreatedAt));
+        
+        CreateMap<Guest, GetGuestDto>()
+            .ForMember(dto => dto.Name, opt => opt.MapFrom(h => h.User.FullName))
+            .ForMember(dto => dto.Introduction, opt => opt.MapFrom(h => h.User.Introduction))
+            .ForMember(dto => dto.AvatarUrl, opt => opt.MapFrom(h => h.User.AvatarUrl))
+            .ForMember(dto => dto.Address, opt => opt.MapFrom(h => h.User.Address))
+            .ForMember(dto => dto.City, opt => opt.MapFrom(h => h.User.City))
+            .ForMember(dto => dto.JoinedAt, opt => opt.MapFrom(h => h.CreatedAt));
+        
         CreateMap<Property, GetPropertyDto>();
         CreateMap<PropertyImage, GetPropertyImageDto>();
         CreateMap<PropertyUtility, GetPropertyUtilityDto>();

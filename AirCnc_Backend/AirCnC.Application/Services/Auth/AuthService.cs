@@ -16,7 +16,7 @@ namespace AirCnC.Application.Services.Auth;
 public interface IAuthService
 {
     Task<TokenDto> LoginAsync(LoginDto logInDto, string role);
-    Task SignUpAsync(SignUpDto signUpDto);
+    Task<GetUserDto> SignUpAsync(SignUpDto signUpDto);
     Task<TokenDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
     Task<TokenDto> GoogleAuthenticateAsync(ExternalAuthDto dto);
 }
@@ -41,7 +41,7 @@ public class AuthService : IAuthService
         _unitOfWork = unitOfWork;
         _guestRepository = guestRepository;
     }
-    public async Task SignUpAsync(SignUpDto signUpDto)
+    public async Task<GetUserDto> SignUpAsync(SignUpDto signUpDto)
     {
         var isEmailExisted = await _userManager.FindByEmailAsync(signUpDto.Email) != null;
         if (isEmailExisted)
@@ -82,6 +82,8 @@ public class AuthService : IAuthService
             await _unitOfWork.RollbackAsync();
             throw;
         }
+        
+        return _mapper.Map<GetUserDto>(user);
     }
 
     public async Task<TokenDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)

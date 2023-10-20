@@ -1,5 +1,5 @@
-using AirCnC.Application.Services.BookingService;
-using AirCnC.Application.Services.BookingService.Dtos;
+using AirCnC.Application.Services.Bookings;
+using AirCnC.Application.Services.Bookings.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers;
