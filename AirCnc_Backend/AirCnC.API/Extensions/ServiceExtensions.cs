@@ -9,6 +9,8 @@ using AirCnC.Application.Services.Email;
 using AirCnC.Application.Services.Guests;
 using AirCnC.Application.Services.Hosts;
 using AirCnC.Application.Services.ImageUploader;
+using AirCnC.Application.Services.Payments;
+using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Properties;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
@@ -45,8 +47,7 @@ public static class ServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPropertyService, PropertyService>();
         services.AddScoped<IBookingService, BookingService>();
-        services.AddScoped<IHostService, HostService>();
-        services.AddScoped<IGuestService, GuestService>();
+        services.AddScoped<IPaymentService, PaymentService>();
         return services;
     }
 
@@ -105,6 +106,7 @@ public static class ServiceExtensions
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.Configure<EmailSettings>(configuration.GetSection("EmailConfiguration"));
         services.Configure<AirCnCSettings>(configuration.GetSection("AirCnC"));
+        services.Configure<PaymentConfig>(configuration.GetSection("PaymentConfig"));
         return services;
     }
 

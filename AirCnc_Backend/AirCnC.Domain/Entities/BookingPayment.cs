@@ -15,7 +15,8 @@ public class BookingPayment : EntityBase
     
     public double Amount { get; set; }
     
-    public BookingPaymentStatus Status { get; set; }
+    public BookingPaymentStatus Status { get; set; } = BookingPaymentStatus.Pending;
     
     public string? Description { get; set; }
+    public ICollection<VNPHistory> VnpHistories { get; set; }
 }

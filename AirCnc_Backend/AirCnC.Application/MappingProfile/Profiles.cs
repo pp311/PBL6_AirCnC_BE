@@ -3,6 +3,7 @@ using AirCnC.Application.Services.Bookings.Dtos;
 using AirCnC.Application.Services.Guests.Dtos;
 using AirCnC.Application.Services.Hosts.Dtos;
 using AirCnC.Application.Services.Properties.Dtos;
+using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Domain.Entities;
 using AutoMapper;
 
@@ -57,5 +58,7 @@ public class Profiles : Profile
 
         CreateMap<Booking, GetBookingForPropertyDto>();
         CreateMap<CreateBookingDto, Booking>();
+        CreateMap<VNPHistoryDTO, VNPHistory>();
+        CreateMap<VNPHistory, VNPHistoryDTO>();
     } 
 }
