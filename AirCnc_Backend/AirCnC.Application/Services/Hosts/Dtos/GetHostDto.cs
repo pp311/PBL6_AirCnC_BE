@@ -11,4 +11,5 @@ public class GetHostDto
     public string? City { get; set; }
     public DateTime JoinedAt { get; set; }
     public int NumberOfReviews { get; set; }
+    public double Rating { get; set; }
 }

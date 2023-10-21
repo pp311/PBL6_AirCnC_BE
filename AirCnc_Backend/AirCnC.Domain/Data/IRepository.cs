@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AirCnC.Domain.Specification;
 
 namespace AirCnC.Domain.Data
@@ -15,6 +16,9 @@ namespace AirCnC.Domain.Data
         Task<IEnumerable<T>> FindListAsync(ISpecification<T> spec);
         
         Task<int> CountAsync(ISpecification<T> spec);
+        Task<int> CountAsync(Expression<Func<T, bool>> predicate);
+        // Task<double> AverageAsync(ISpecification<T> spec, Expression<Func<T, int>> selector);
+        Task<double> AverageAsync(ISpecification<T> spec, Expression<Func<T, double>> selector);
         Task<bool> AnyAsync(ISpecification<T> spec);
         Task<bool> AnyAsync(int id);
         

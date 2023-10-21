@@ -52,6 +52,56 @@ public static class SeedData
         modelBuilder.Entity<Booking>().HasData(bookings);
         var propertyUtilities = GetPropertyUtility();
         modelBuilder.Entity<PropertyUtility>().HasData(propertyUtilities);
+        
+        var guestReviews = GetGuestReviews(guests, hosts);
+        modelBuilder.Entity<GuestReview>().HasData(guestReviews);
+        
+        var hostReviews = GetHostReviews(hosts, guests);
+        modelBuilder.Entity<HostReview>().HasData(hostReviews);
+        
+        var propertyReviews = GetPropertyReviews(properties, guests);
+        modelBuilder.Entity<PropertyReview>().HasData(propertyReviews);
+    }
+
+    private static List<PropertyReview> GetPropertyReviews(List<Property> properties, List<Guest> guests)
+    {
+        return new Faker<PropertyReview>()
+            .RuleFor(b => b.PropertyId, f => f.PickRandom(properties).Id)
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests).Id)
+            .RuleFor(b => b.Content, f => f.Lorem.Sentence())
+            .RuleFor(b => b.Cleanliness, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Communication, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.CheckIn, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Accuracy, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Location, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Value, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .Generate(100);
+    }
+
+    private static List<HostReview> GetHostReviews(List<Host> hosts, List<Guest> guests)
+    {
+        return new Faker<HostReview>()
+            .RuleFor(b => b.HostId, f => f.PickRandom(hosts).Id)
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests).Id)
+            .RuleFor(b => b.Content, f => f.Lorem.Sentence())
+            .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .Generate(100);
+    }
+
+    private static List<GuestReview> GetGuestReviews(List<Guest> guests, List<Host> hosts)
+    {
+        return new Faker<GuestReview>()
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests).Id)
+            .RuleFor(b => b.HostId, f => f.PickRandom(hosts).Id)
+            .RuleFor(b => b.Content, f => f.Lorem.Sentence())
+            .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .Generate(100);
     }
 
     private static List<Booking> GetBookings(List<Property> properties,

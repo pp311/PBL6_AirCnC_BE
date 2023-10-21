@@ -1,14 +1,13 @@
-using AirCnC.Domain.Entities.Base;
+using System.Text.Json.Serialization;
 
-namespace AirCnC.Domain.Entities;
+namespace AirCnC.Application.Services.Reviews.Dtos;
 
-public class PropertyReview : EntityBase
+public class CreatePropertyReviewDto
 {
-    public int PropertyId { get; set; }
-    public Property Property { get; set; } = null!;
-    
+    [JsonIgnore]
     public int GuestId { get; set; }
-    public Guest Guest { get; set; } = null!;
+    [JsonIgnore]
+    public int PropertyId { get; set; }
     
     public int Cleanliness { get; set; }
     public int Communication { get; set; }
@@ -18,5 +17,4 @@ public class PropertyReview : EntityBase
     public int Value { get; set; }
     
     public string Content { get; set; } = string.Empty;
-    
 }

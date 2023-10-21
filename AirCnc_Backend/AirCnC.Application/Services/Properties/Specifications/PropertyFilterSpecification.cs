@@ -1,4 +1,5 @@
 using AirCnC.Application.Services.Properties.Dtos;
+using AirCnC.Application.Services.Properties.Enums;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Specification;
 
@@ -9,6 +10,8 @@ public class PropertyFilterSpecification : Specification<Property>
     public PropertyFilterSpecification(PropertyQueryParameters pqp)
     {
         AddInclude(p => p.PropertyImages);
+        AddInclude(p => p.PropertyReviews);
+        AddInclude(p => p.Host.User);
         // Search by name, description, city
         if (!string.IsNullOrWhiteSpace(pqp.Search))
         {
@@ -37,6 +40,22 @@ public class PropertyFilterSpecification : Specification<Property>
         if (pqp.OrderBy is not null)
         {
             AddOrderByField(pqp.OrderBy.ToString());
+            var orderBy = pqp.OrderBy switch
+            {
+                PropertySortBy.Rating => $"{nameof(Property.PropertyReviews)}.Average(" +
+                                         $"({nameof(PropertyReview.Cleanliness)} + " +
+                                         $"{nameof(PropertyReview.Accuracy)} + " +
+                                         $"{nameof(PropertyReview.Communication)} + " +
+                                         $"{nameof(PropertyReview.CheckIn)} + " +
+                                         $"{nameof(PropertyReview.Value)} + " +
+                                         $"{nameof(PropertyReview.Location)}) / 6.0)",
+                PropertySortBy.NumberOfReviews => $"{nameof(Property.PropertyReviews)}.Count()",
+                PropertySortBy.Title => pqp.OrderBy.ToString(),
+                PropertySortBy.Description => pqp.OrderBy.ToString(),
+                PropertySortBy.PricePerNight => pqp.OrderBy.ToString(),
+                _ => nameof(PropertySortBy.Id)
+            };
+            AddOrderByField(orderBy);
             if (pqp.IsDescending)
                 ApplyDescending();
         }

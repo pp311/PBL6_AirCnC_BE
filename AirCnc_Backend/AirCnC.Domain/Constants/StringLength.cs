@@ -10,7 +10,7 @@ public static class StringLength
     public const int State = 256;
     public const int Country = 256;
     public const int Email = 256;
-    public const int PhoneNumber = 20;
+    public const int PhoneNumber = 32;
     public const int Url = 1024;
     public const int ReviewContent = 2048;
     public const int PaymentCode = 64;
