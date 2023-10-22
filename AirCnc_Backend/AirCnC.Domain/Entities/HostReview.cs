@@ -8,5 +8,6 @@ public class HostReview : EntityBase
     public Host Host { get; set; } = null!;
     public int GuestId { get; set; }
     public Guest Guest { get; set; } = null!;
+    public double Rating { get; set; }
     public string Content { get; set; } = string.Empty;
 }

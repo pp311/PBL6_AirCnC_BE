@@ -1,4 +1,5 @@
 ﻿using AirCnC.Domain.Enums;
+using Newtonsoft.Json;
 
 namespace AirCnC.Application.Services.Properties.Dtos
 {
@@ -11,13 +12,23 @@ namespace AirCnC.Application.Services.Properties.Dtos
         public int BathroomCount { get; set; }
         public int MaxAdultCount { get; set; }
         public int MaxChildCount { get; set; }
+        
+        public int HostId { get; set; }
+        public string HostName { get; set; } = string.Empty;
+        
+        public double Rating { get; set; }
+        public int NumberOfReviews { get; set; }
 
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public double PricePerNight { get; set; }
+        
         public ICollection<GetPropertyImageDto>? PropertyImages { get; set; }
+        
+        [JsonProperty(NullValueHandling=NullValueHandling.Ignore)]        
         public ICollection<GetPropertyUtilityDto>? PropertyUtilities { get; set; }
-        public PropertyStatus Status { get; set; } = PropertyStatus.Pending;
+        
+        public PropertyStatus Status { get; set; }
         public string? RejectionReason { get; set; }
     }
 }

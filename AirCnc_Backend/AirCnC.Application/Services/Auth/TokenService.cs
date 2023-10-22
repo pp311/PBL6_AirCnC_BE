@@ -107,9 +107,10 @@ public class TokenService : ITokenService
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email!),
+            new(ClaimTypes.Name, user.FullName),
+            new(ClaimTypes.Role, roles.First()),
+            new(ClaimTypes.Uri, user.AvatarUrl ?? string.Empty)
         };
-        
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
         return claims;
     }
 }

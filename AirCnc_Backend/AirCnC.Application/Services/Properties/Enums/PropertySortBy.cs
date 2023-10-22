@@ -6,4 +6,6 @@ public enum PropertySortBy
     Title,
     Description,
     PricePerNight,
+    Rating,
+    NumberOfReviews,
 }

@@ -10,6 +10,7 @@ using AirCnC.Application.Services.Guests;
 using AirCnC.Application.Services.Hosts;
 using AirCnC.Application.Services.ImageUploader;
 using AirCnC.Application.Services.Properties;
+using AirCnC.Application.Services.Reviews;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Infrastructure.Cloudinary;
@@ -47,6 +48,7 @@ public static class ServiceExtensions
         services.AddScoped<IBookingService, BookingService>();
         services.AddScoped<IHostService, HostService>();
         services.AddScoped<IGuestService, GuestService>();
+        services.AddScoped<IReviewService, ReviewService>();
         return services;
     }
 

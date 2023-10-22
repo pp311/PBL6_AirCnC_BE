@@ -192,7 +192,7 @@ public class AuthService : IAuthService
             if (!addRoleResult.Succeeded)
                 throw new UserCreateFailException(result.Errors.First().Description);
 
-            _guestRepository.Add(new Guest { Id = user.Id });
+            _guestRepository.Add(new Guest { UserId = user.Id });
             await _unitOfWork.SaveChangesAsync();
 
             await _unitOfWork.CommitTransactionAsync();

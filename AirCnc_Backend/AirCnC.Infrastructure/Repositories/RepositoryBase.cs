@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities.Base;
 using AirCnC.Domain.Specification;
@@ -42,6 +43,15 @@ public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : Enti
 
     public async Task<int> CountAsync(ISpecification<TEntity> spec)
         => await GetQuery<TEntity>.From(DbSet, spec).CountAsync();
+
+    public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+        => await DbSet.CountAsync(predicate);
+    
+    // public async Task<double> AverageAsync(ISpecification<TEntity> spec, Expression<Func<TEntity, int>> selector)
+    //     => await GetQuery<TEntity>.From(DbSet, spec).AverageAsync(selector);
+
+    public async Task<double> AverageAsync(ISpecification<TEntity> spec, Expression<Func<TEntity, double>> selector)
+        => await GetQuery<TEntity>.From(DbSet, spec).AverageAsync(selector);
 
     public async Task<bool> AnyAsync(ISpecification<TEntity> spec)
         => await GetQuery<TEntity>.From(DbSet, spec).AnyAsync();
