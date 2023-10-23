@@ -7,11 +7,15 @@ namespace AirCnC.Application.Services.Properties.Specifications;
 
 public class PropertyFilterSpecification : Specification<Property>
 {
-    public PropertyFilterSpecification(PropertyQueryParameters pqp)
+    public PropertyFilterSpecification(PropertyQueryParameters pqp, int hostId = 0)
     {
         AddInclude(p => p.PropertyImages);
         AddInclude(p => p.PropertyReviews);
         AddInclude(p => p.Host.User);
+        
+        if (hostId > 0)
+            AddFilter(p => p.HostId == hostId);
+        
         // Search by name, description, city
         if (!string.IsNullOrWhiteSpace(pqp.Search))
         {

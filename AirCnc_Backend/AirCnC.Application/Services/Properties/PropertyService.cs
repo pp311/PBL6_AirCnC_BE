@@ -15,6 +15,7 @@ namespace AirCnC.Application.Services.Properties;
 public interface IPropertyService
 {
     Task<PagedList<GetPropertyDto>> GetListAsync(PropertyQueryParameters propertyQueryParameters);
+    Task<PagedList<GetPropertyDto>> GetListByHostIdAsync(int hostId, PropertyQueryParameters propertyQueryParameters);
     Task<GetPropertyDto> GetByIdAsync(int id);
     Task<GetPropertyDto> CreateAsync(UpsertPropertyDto upsertPropertyDto);
     Task DeleteByIdAsync(int id);
@@ -44,6 +45,28 @@ public class PropertyService : IPropertyService
         _currentUser = currentUser;
         _hostRepository = hostRepository;
         _propertyReviewRepository = propertyReviewRepository;
+    }
+
+    public async Task<PagedList<GetPropertyDto>> GetListByHostIdAsync(int hostId, PropertyQueryParameters pqp)
+    {
+        // t luoi nen dung lai cai spec nay
+        var propertyFilterSpec = new PropertyFilterSpecification(pqp, hostId);
+
+        var (items, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertyFilterSpec);
+
+        var result = _mapper.Map<List<GetPropertyDto>>(items);
+        
+        // Todo: Optimize this
+        foreach (var item in result)
+        {
+            item.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == item.Id);
+            if (item.NumberOfReviews == 0) continue;
+            item.Rating = await _propertyReviewRepository
+                .AverageAsync(new PropertyReviewSpecification(item.Id),
+                    r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+        }
+
+        return new PagedList<GetPropertyDto>(result, totalCount, pqp.PageIndex, pqp.PageSize);
     }
 
     public async Task<GetPropertyDto> GetByIdAsync(int id)
