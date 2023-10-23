@@ -52,6 +52,56 @@ public static class SeedData
         modelBuilder.Entity<Booking>().HasData(bookings);
         var propertyUtilities = GetPropertyUtility();
         modelBuilder.Entity<PropertyUtility>().HasData(propertyUtilities);
+        
+        var guestReviews = GetGuestReviews(guests, hosts);
+        modelBuilder.Entity<GuestReview>().HasData(guestReviews);
+        
+        var hostReviews = GetHostReviews(hosts, guests);
+        modelBuilder.Entity<HostReview>().HasData(hostReviews);
+        
+        var propertyReviews = GetPropertyReviews(properties, guests);
+        modelBuilder.Entity<PropertyReview>().HasData(propertyReviews);
+    }
+
+    private static List<PropertyReview> GetPropertyReviews(List<Property> properties, List<Guest> guests)
+    {
+        return new Faker<PropertyReview>()
+            .RuleFor(b => b.PropertyId, f => f.PickRandom(properties).Id)
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests).Id)
+            .RuleFor(b => b.Content, f => f.Lorem.Sentence())
+            .RuleFor(b => b.Cleanliness, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Communication, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.CheckIn, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Accuracy, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Location, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Value, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .Generate(1000);
+    }
+
+    private static List<HostReview> GetHostReviews(List<Host> hosts, List<Guest> guests)
+    {
+        return new Faker<HostReview>()
+            .RuleFor(b => b.HostId, f => f.PickRandom(hosts).Id)
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests).Id)
+            .RuleFor(b => b.Content, f => f.Lorem.Sentence())
+            .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .Generate(500);
+    }
+
+    private static List<GuestReview> GetGuestReviews(List<Guest> guests, List<Host> hosts)
+    {
+        return new Faker<GuestReview>()
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests).Id)
+            .RuleFor(b => b.HostId, f => f.PickRandom(hosts).Id)
+            .RuleFor(b => b.Content, f => f.Lorem.Sentence())
+            .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
+            .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .Generate(500);
     }
 
     private static List<Booking> GetBookings(List<Property> properties,
@@ -72,7 +122,7 @@ public static class SeedData
             .RuleFor(b => b.CancellationPolicyType, f => f.PickRandom<CancellationPolicyType>())
             .RuleFor(b => b.Status, (f, b) => b.CheckOutDate < DateTime.UtcNow ? BookingStatus.Completed : f.PickRandom<BookingStatus>())
             .RuleFor(b => b.GuestId, f => f.PickRandom(users).Id)
-            .Generate(100);
+            .Generate(3000);
     }
 
     private static bool GetPropertyImages(List<Property> properties,
@@ -132,7 +182,7 @@ public static class SeedData
                 return user.Id;
             })
             .RuleFor(h => h.Id, f => f.IndexFaker + 1)
-            .Generate(5);
+            .Generate(50);
         return hosts;
     }
 
@@ -147,17 +197,17 @@ public static class SeedData
             .RuleFor(p => p.BathroomCount, f => f.Random.Number(1, 3))
             .RuleFor(p => p.MaxAdultCount, f => f.Random.Number(1, 10))
             .RuleFor(p => p.MaxChildCount, f => f.Random.Number(1, 10))
-            .RuleFor(p => p.Title, f => f.Lorem.Sentence(10,20))
+            .RuleFor(p => p.Title, f => f.Lorem.Sentence(1))
             .RuleFor(p => p.Description, f => f.Lorem.Paragraph())
             .RuleFor(p => p.Latitude, f => f.Address.Latitude())
             .RuleFor(p => p.Longitude, f => f.Address.Longitude())
             .RuleFor(p => p.Address, f => f.Address.StreetAddress())
             .RuleFor(p => p.City, f => f.Address.City())
             .RuleFor(p => p.CancellationPolicyType, f => f.PickRandom<CancellationPolicyType>())
-            .RuleFor(p => p.PricePerNight, f => f.Random.Double(10, 100))
-            .RuleFor(p => p.CleaningFee, f => f.Random.Double(10, 100))
+            .RuleFor(p => p.PricePerNight, f => f.Random.Int(100, 50000) * 1000)
+            .RuleFor(p => p.CleaningFee, f => f.Random.Int(30, 350) * 1000)
             .RuleFor(p => p.Status, f => f.PickRandom<PropertyStatus>())
-            .Generate(30);
+            .Generate(100);
     }
 
     private static List<User> GetUsers()
@@ -178,7 +228,7 @@ public static class SeedData
             .RuleFor(u => u.EmailConfirmed, _ => true)
             .RuleFor(u => u.SecurityStamp, _ => Guid.NewGuid().ToString())
             .RuleFor(u => u.PasswordHash , _ => new PasswordHasher<User>().HashPassword(null!, "User@123"))
-            .Generate(10);
+            .Generate(500);
     }
 
     private static List<IdentityRole<int>> GetDefaultRoles()

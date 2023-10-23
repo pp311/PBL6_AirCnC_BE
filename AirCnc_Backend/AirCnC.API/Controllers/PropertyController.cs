@@ -22,6 +22,13 @@ namespace AirCnC.API.Controllers
             var result = await _propertyService.GetListAsync(pqp);
             return Ok(result);
         }
+        
+        [HttpGet("host/{hostId:int}")]
+        public async Task<IActionResult> GetPropertyListByHostId(int hostId, [FromQuery] PropertyQueryParameters pqp)
+        {
+            var result = await _propertyService.GetListByHostIdAsync(hostId, pqp);
+            return Ok(result);
+        }
 
         [HttpPost]
         [Authorize]
@@ -37,17 +44,13 @@ namespace AirCnC.API.Controllers
         public async Task<IActionResult> GetPropertyById(int propertyId)
         {
             var result = await _propertyService.GetByIdAsync(propertyId);
-            if (result is null)
-                return NotFound();
             return Ok(result);
         }
 
         [HttpDelete("{propertyId:int}")]
         public async Task<IActionResult> DeleteProperty(int propertyId)
         {
-            var result = await _propertyService.DeleteByIdAsync(propertyId);
-            if (result is null)
-                return NotFound();
+            await _propertyService.DeleteByIdAsync(propertyId);
             return NoContent();
         }
 
@@ -57,8 +60,6 @@ namespace AirCnC.API.Controllers
             if (upsertPropertyDto is null)
                 return BadRequest();
             var result = await _propertyService.UpdateAsync(propertyId, upsertPropertyDto);
-            if (result is null)
-                return NotFound();
             return Ok(result);
         }
         

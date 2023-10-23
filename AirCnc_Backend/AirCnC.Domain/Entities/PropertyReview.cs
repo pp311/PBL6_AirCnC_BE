@@ -17,6 +17,6 @@ public class PropertyReview : EntityBase
     public int Location { get; set; }
     public int Value { get; set; }
     
-    public string? Content { get; set; }
+    public string Content { get; set; } = string.Empty;
     
 }

@@ -31,12 +31,9 @@ public class Profiles : Profile
             .ForMember(dto => dto.City, opt => opt.MapFrom(h => h.User.City))
             .ForMember(dto => dto.JoinedAt, opt => opt.MapFrom(h => h.CreatedAt));
         
-        CreateMap<Property, GetPropertyDto>();
-        CreateMap<PropertyImage, GetPropertyImageDto>();
-        CreateMap<PropertyUtility, GetPropertyUtilityDto>();
-        CreateMap<UpsertPropertyDto,Property>();
-        CreateMap<UpsertPropertyImageDto, PropertyImage>();
-        CreateMap<PropertyUtilityDto, PropertyUtility>();
+        
+         
+        
 
         CreateMap<Booking, GetBookingForHostDto>()
             .ForMember(dto => dto.GuestName, opt => opt.MapFrom(b => b.Guest.User.FullName))

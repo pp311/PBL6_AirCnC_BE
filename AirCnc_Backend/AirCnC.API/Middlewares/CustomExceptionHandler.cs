@@ -27,6 +27,7 @@ public static class CustomExceptionHandler
                         EntityAlreadyExistedException => (int)HttpStatusCode.Conflict,
                         RefreshTokenExpiredException => (int)HttpStatusCode.Unauthorized,
                         InvalidPasswordException => (int)HttpStatusCode.Unauthorized,
+                        ForbiddenAccessException => (int)HttpStatusCode.Forbidden,
                         _ => (int)HttpStatusCode.InternalServerError
                     };
 

@@ -7,6 +7,7 @@ public class PropertyDetailSpecification : Specification<Property>
 {
     public PropertyDetailSpecification(int id)
     {
+        AddInclude(p => p.Host.User);
         AddInclude(p => p.PropertyImages);
         AddInclude(p => p.PropertyUtilities);
         AddFilter(p => p.Id == id);
