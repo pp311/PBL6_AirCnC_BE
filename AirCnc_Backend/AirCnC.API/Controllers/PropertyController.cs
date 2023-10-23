@@ -22,6 +22,13 @@ namespace AirCnC.API.Controllers
             var result = await _propertyService.GetListAsync(pqp);
             return Ok(result);
         }
+        
+        [HttpGet("host/{hostId:int}")]
+        public async Task<IActionResult> GetPropertyListByHostId(int hostId, [FromQuery] PropertyQueryParameters pqp)
+        {
+            var result = await _propertyService.GetListByHostIdAsync(hostId, pqp);
+            return Ok(result);
+        }
 
         [HttpPost]
         [Authorize]
