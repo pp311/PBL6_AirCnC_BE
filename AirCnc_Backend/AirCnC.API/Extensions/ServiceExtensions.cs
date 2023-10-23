@@ -6,8 +6,6 @@ using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.Bookings;
 using AirCnC.Application.Services.Email;
-using AirCnC.Application.Services.Guests;
-using AirCnC.Application.Services.Hosts;
 using AirCnC.Application.Services.ImageUploader;
 using AirCnC.Application.Services.Payments;
 using AirCnC.Application.Services.Payments.Dtos;

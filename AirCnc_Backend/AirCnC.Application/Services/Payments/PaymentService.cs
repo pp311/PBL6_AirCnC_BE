@@ -1,15 +1,13 @@
 using AutoMapper;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using AirCnC.Application.Commons;
-using AirCnC.Application.Services.Properties.Dtos;
-using AirCnC.Application.Services.Properties.Specifications;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Payments.Specifications;
 using AirCnC.Domain.Enums;
 using AirCnC.Domain.Constants;
+using AirCnC.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
 
 
@@ -17,15 +15,14 @@ namespace AirCnC.Application.Services.Payments;
 public interface IPaymentService
 {
     Task<string> CreateBookingPayment(string ip, CreateBookingPaymentDto createBookingPaymentDto);
-    Task ReceiveDataFromVNP(VNPayReturnDTO vnpayReturnDTO);
+    Task ReceiveDataFromVnp(VnPayReturnDto vnpayReturnDto);
     //Task<PagedList<UserVNPHistoryDTO>> GetVNPHistories(int userId, VNPParams vnpParams);
 }
 public class PaymentService : IPaymentService
 {
     private readonly IRepository<BookingPayment> _bookingPaymentRepository;
     private readonly IRepository<Booking> _bookingRepository;
-    private readonly IRepository<VNPHistory> _vnpHistoryRepository;
-    private readonly IRepository<Guest> _guestRepository;
+    private readonly IRepository<VnpHistory> _vnpHistoryRepository;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
     private readonly PaymentConfig _paymentConfig;
@@ -33,118 +30,124 @@ public class PaymentService : IPaymentService
 
 
     public PaymentService(IRepository<BookingPayment> bookingPaymentRepository, IMapper mapper,
-        IOptions<PaymentConfig> paymentConfig, IUnitOfWork unitOfWork, ILogger<PaymentService> logger,
-        IRepository<Booking> bookingRepository, IRepository<VNPHistory> vnpHistoryRepository,
-        IRepository<Guest> guestRepository
-        )
+                          IOptions<PaymentConfig> paymentConfig, IUnitOfWork unitOfWork, IRepository<VnpHistory> vnpHistoryRepository,
+                          IRepository<Booking> bookingRepository,
+                          ILogger<PaymentService> logger)
     {
         _bookingPaymentRepository = bookingPaymentRepository;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _paymentConfig = paymentConfig.Value;
-        _logger = logger;
-        _bookingRepository = bookingRepository;
         _vnpHistoryRepository = vnpHistoryRepository;
-        _guestRepository = guestRepository;
-
+        _bookingRepository = bookingRepository;
+        _logger = logger;
     }
 
     public async Task<string> CreateBookingPayment(string ip, CreateBookingPaymentDto createBookingPaymentDto)
     {
-        var temp = _paymentConfig;
+        var booking = await _bookingRepository.GetByIdAsync(createBookingPaymentDto.BookingId)
+                      ?? throw new EntityNotFoundException(nameof(Booking), createBookingPaymentDto.BookingId.ToString());
+       
+        if (booking.Status != BookingStatus.Pending)
+            throw new BadInputException("Booking is already processed");
+        
         // Create DTO
-        VNPHistoryDTO vnpHistoryDTO = new VNPHistoryDTO();
-        vnpHistoryDTO.vnp_TxnRef = DateTime.UtcNow.Ticks;
-        vnpHistoryDTO.vnp_OrderInfo = "#" + vnpHistoryDTO.vnp_TxnRef.ToString() + " | " + createBookingPaymentDto.OrderDesc;
-        vnpHistoryDTO.vnp_Amount = createBookingPaymentDto.Amount;
-        vnpHistoryDTO.vnp_BankCode = createBookingPaymentDto.BankCode;
-        vnpHistoryDTO.vnp_TmnCode = _paymentConfig.VNPTmnCode;
+        VnpHistoryDto vnpHistoryDto = new VnpHistoryDto();
+        vnpHistoryDto.vnp_TxnRef = DateTime.UtcNow.Ticks;
+        vnpHistoryDto.vnp_OrderInfo = "#" + vnpHistoryDto.vnp_TxnRef + " | " + "Thanh toan dat phong #" + booking.Id;
+        vnpHistoryDto.vnp_Amount = (long)booking.TotalPrice;
+        vnpHistoryDto.vnp_BankCode = createBookingPaymentDto.BankCode!;
+        vnpHistoryDto.vnp_TmnCode = _paymentConfig.VnpTmnCode;
         //vnpHistoryDTO.BookingPaymentId= createBookingPaymentDto.BookingId;
-        vnpHistoryDTO.vnp_CreateDate = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        vnpHistoryDto.vnp_CreateDate = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
 
         //Build URL for VNPAY
         VnPayLibrary vnpay = new VnPayLibrary();
-        vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
+        vnpay.AddRequestData("vnp_Version", VnPayLibrary.Version);
         vnpay.AddRequestData("vnp_Command", "pay");
-        vnpay.AddRequestData("vnp_TmnCode", vnpHistoryDTO.vnp_TmnCode);
+        vnpay.AddRequestData("vnp_TmnCode", vnpHistoryDto.vnp_TmnCode);
         // Must multiply by 100 to send to vnpay system
-        vnpay.AddRequestData("vnp_Amount", (vnpHistoryDTO.vnp_Amount * 100).ToString());
-        vnpay.AddRequestData("vnp_BankCode", vnpHistoryDTO.vnp_BankCode);
-        vnpay.AddRequestData("vnp_CreateDate", vnpHistoryDTO.vnp_CreateDate);
+        vnpay.AddRequestData("vnp_Amount", (vnpHistoryDto.vnp_Amount * 100).ToString());
+        vnpay.AddRequestData("vnp_BankCode", vnpHistoryDto.vnp_BankCode);
+        vnpay.AddRequestData("vnp_CreateDate", vnpHistoryDto.vnp_CreateDate);
         vnpay.AddRequestData("vnp_CurrCode", "VND");
         vnpay.AddRequestData("vnp_Locale", "vn");
         vnpay.AddRequestData("vnp_IpAddr", ip);
-        vnpay.AddRequestData("vnp_OrderInfo", vnpHistoryDTO.vnp_OrderInfo);
-        vnpay.AddRequestData("vnp_ReturnUrl", _paymentConfig.VNPReturnURL);
-        vnpay.AddRequestData("vnp_TxnRef", vnpHistoryDTO.vnp_TxnRef.ToString());
+        vnpay.AddRequestData("vnp_OrderInfo", vnpHistoryDto.vnp_OrderInfo);
+        vnpay.AddRequestData("vnp_ReturnUrl", _paymentConfig.VnpReturnUrl);
+        vnpay.AddRequestData("vnp_TxnRef", vnpHistoryDto.vnp_TxnRef.ToString());
         vnpay.AddRequestData("vnp_OrderType", "other");
 
         //Create url for VNPAY
-        string paymentUrl = vnpay.CreateRequestUrl(_paymentConfig.VNPUrl, _paymentConfig.VNPHashSecret, vnpHistoryDTO);
+        string paymentUrl = vnpay.CreateRequestUrl(_paymentConfig.VnpUrl, _paymentConfig.VnpHashSecret, vnpHistoryDto);
 
         //mapping
-        VNPHistory vnpHistory = _mapper.Map<VNPHistory>(vnpHistoryDTO);
+        VnpHistory vnpHistory = _mapper.Map<VnpHistory>(vnpHistoryDto);
 
         // Create bookingPayment entity
-        BookingPayment bookingPayment = new BookingPayment()
+        var bookingPayment = await _bookingPaymentRepository.FindOneAsync(new BookingPaymentByBookingIdSpecification(createBookingPaymentDto.BookingId));
+        if (bookingPayment == null)
         {
-            PaymentCode = Guid.NewGuid().ToString(),
-            GuestId = createBookingPaymentDto.GuestId,
-            BookingId = createBookingPaymentDto.BookingId,
-            Amount = createBookingPaymentDto.Amount,
-            Status = BookingPaymentStatus.Pending,
-            VnpHistories = new List<VNPHistory>()
-        };
-
-        // save payment into db
-        _bookingPaymentRepository.Add(bookingPayment);
+            bookingPayment ??= new BookingPayment()
+            {
+                PaymentCode = Guid.NewGuid().ToString(),
+                GuestId = booking.GuestId,
+                BookingId = booking.Id,
+                Amount = booking.TotalPrice,
+                Status = BookingPaymentStatus.Pending,
+                VnpHistories = new List<VnpHistory>()
+            };
+            _bookingPaymentRepository.Add(bookingPayment);
+        }
+        bookingPayment.VnpHistories.Clear();
         bookingPayment.VnpHistories.Add(vnpHistory);
         
+        // save payment into db
         await _unitOfWork.SaveChangesAsync();
-
 
         return paymentUrl;
     }
 
-
-    public async Task ReceiveDataFromVNP(VNPayReturnDTO vnpayReturnDTO)
+    public async Task ReceiveDataFromVnp(VnPayReturnDto vnpayReturnDto)
     {
-        VnPayLibrary vnpay = new VnPayLibrary();
-
+        // VnPayLibrary vnpay = new VnPayLibrary();
         // validate hash key
 
         // TODO: update gold & payment status
-        if (PaymentConst.VNP_TRANSACTION_STATUS_SUCCESS.Equals(vnpayReturnDTO.vnp_ResponseCode)
-            && PaymentConst.VNP_TRANSACTION_STATUS_SUCCESS.Equals(vnpayReturnDTO.vnp_TransactionStatus))
+        if (PaymentConst.VnpTransactionStatusSuccess.Equals(vnpayReturnDto.vnp_ResponseCode)
+            && PaymentConst.VnpTransactionStatusSuccess.Equals(vnpayReturnDto.vnp_TransactionStatus))
         {
 
-            Console.WriteLine("giao dich thanh cong");
-            VNPHistory vnpHistory = await _vnpHistoryRepository.FindOneAsync(new VNPHistoryGetByTxnRef(vnpayReturnDTO.vnp_TxnRef));
+            _logger.LogInformation("giao dich thanh cong");
+            VnpHistory? vnpHistory = await _vnpHistoryRepository.FindOneAsync(new VnpHistoryGetByTxnRef(vnpayReturnDto.vnp_TxnRef));
             if (vnpHistory == null)
             {
-                Console.WriteLine("Khong ton tai payment #" + vnpayReturnDTO.vnp_TxnRef);
+                _logger.LogError("Khong ton tai payment #" + vnpayReturnDto.vnp_TxnRef);
                 return;
             }
 
-            bool checkSignature = vnpHistory.vnp_SecureHash.Equals(vnpHistory.vnp_SecureHash);
-            bool isHandledOrder = PaymentConst.VNP_TRANSACTION_STATUS_SUCCESS.Equals(vnpHistory.vnp_TransactionStatus);
+            bool checkSignature = vnpHistory.vnp_SecureHash!.Equals(vnpHistory.vnp_SecureHash);
+            bool isHandledOrder = PaymentConst.VnpTransactionStatusSuccess.Equals(vnpHistory.vnp_TransactionStatus);
 
             if (checkSignature && !isHandledOrder)
             {
-                vnpHistory.vnp_TransactionStatus = vnpayReturnDTO.vnp_TransactionStatus;
+                vnpHistory.vnp_TransactionStatus = vnpayReturnDto.vnp_TransactionStatus;
                 vnpHistory.BookingPayment.Status = BookingPaymentStatus.Paid;
                 _vnpHistoryRepository.Update(vnpHistory);
+                
+                var booking = await _bookingRepository.GetByIdAsync(vnpHistory.BookingPayment.BookingId);
+                booking!.Status = BookingStatus.Confirmed;
+                
                 await _unitOfWork.SaveChangesAsync();
-
             }
             else
             {
-                Console.WriteLine("signature: " + checkSignature + ", order was handled: " + isHandledOrder);
+                _logger.LogInformation("signature: " + checkSignature + ", order was handled: " + isHandledOrder);
             }
         }
         else
         {
-            Console.WriteLine("Co loi xay ra trong qua trinh xu ly");
+            _logger.LogError("Co loi xay ra trong qua trinh xu ly");
         }
     }
 

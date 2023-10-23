@@ -1,20 +1,17 @@
 ﻿using AirCnC.Application.Services.Payments.Dtos;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
 
 
 namespace AirCnC.Application.Commons
 {
     public class VnPayLibrary
     {
-        public const string VERSION = "2.1.0";
-        private SortedList<String, String> _requestData = new SortedList<String, String>(new VnPayCompare());
-        private SortedList<String, String> _responseData = new SortedList<String, String>(new VnPayCompare());
+        public const string Version = "2.1.0";
+        private readonly SortedList<string, string> _requestData = new (new VnPayCompare());
+        private readonly SortedList<string, string> _responseData = new (new VnPayCompare());
 
         public void AddRequestData(string key, string value)
         {
@@ -34,7 +31,7 @@ namespace AirCnC.Application.Commons
 
         public string GetResponseData(string key)
         {
-            string retValue;
+            string? retValue;
             if (_responseData.TryGetValue(key, out retValue))
             {
                 return retValue;
@@ -47,7 +44,7 @@ namespace AirCnC.Application.Commons
 
         #region Request
 
-        public string CreateRequestUrl(string baseUrl, string vnp_HashSecret, VNPHistoryDTO vnpHistoryDTO)
+        public string CreateRequestUrl(string baseUrl, string vnpHashSecret, VnpHistoryDto vnpHistoryDto)
         {
             StringBuilder data = new StringBuilder();
             foreach (KeyValuePair<string, string> kv in _requestData)
@@ -66,9 +63,9 @@ namespace AirCnC.Application.Commons
 
                 signData= signData.Remove(data.Length - 1, 1);
             }
-            string vnp_SecureHash = Utils.HmacSHA512(vnp_HashSecret , signData);
-            baseUrl += "vnp_SecureHash=" + vnp_SecureHash;
-            vnpHistoryDTO.vnp_SecureHash = vnp_SecureHash;
+            var vnpSecureHash = Utils.HmacSha512(vnpHashSecret , signData);
+            baseUrl += "vnp_SecureHash=" + vnpSecureHash;
+            vnpHistoryDto.vnp_SecureHash = vnpSecureHash;
             return baseUrl;
         }
 
@@ -81,7 +78,7 @@ namespace AirCnC.Application.Commons
         public bool ValidateSignature(string inputHash, string secretKey)
         {
             string rspRaw = GetResponseData();
-            string myChecksum = Utils.HmacSHA512(secretKey, rspRaw);
+            string myChecksum = Utils.HmacSha512(secretKey, rspRaw);
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
         private string GetResponseData()
@@ -118,7 +115,7 @@ namespace AirCnC.Application.Commons
     {
          
 
-        public static String HmacSHA512(string key, String inputData)
+        public static String HmacSha512(string key, String inputData)
         {
             var hash = new StringBuilder(); 
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
@@ -155,7 +152,7 @@ namespace AirCnC.Application.Commons
 
     public class VnPayCompare : IComparer<string>
     {
-        public int Compare(string x, string y)
+        public int Compare(string? x, string? y)
         {
             if (x == y) return 0;
             if (x == null) return -1;

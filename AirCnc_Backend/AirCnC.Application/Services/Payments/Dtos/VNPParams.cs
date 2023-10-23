@@ -2,7 +2,7 @@ using AirCnC.Application.Commons;
 
 namespace AirCnC.Application.Services.Payments.Dtos;
 
-public class VNPParams : PagingParameters
+public class VnpParams : PagingParameters
 {
     public DateTime? FromDate { get; set; }
 

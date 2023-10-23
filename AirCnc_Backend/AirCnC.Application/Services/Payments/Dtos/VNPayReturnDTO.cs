@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Web;
-
+// ReSharper disable InconsistentNaming
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 namespace AirCnC.Application.Services.Payments.Dtos
 {
-    public class VNPayReturnDTO
+    public class VnPayReturnDto
     {
         public long vnp_Amount { get; set; }
         public string vnp_BankCode { get; set; }
@@ -20,3 +18,4 @@ namespace AirCnC.Application.Services.Payments.Dtos
         public string vnp_SecureHash { get; set; }
     }
 }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

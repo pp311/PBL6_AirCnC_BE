@@ -58,7 +58,7 @@ public class Profiles : Profile
 
         CreateMap<Booking, GetBookingForPropertyDto>();
         CreateMap<CreateBookingDto, Booking>();
-        CreateMap<VNPHistoryDTO, VNPHistory>();
-        CreateMap<VNPHistory, VNPHistoryDTO>();
+        CreateMap<VnpHistoryDto, VnpHistory>();
+        CreateMap<VnpHistory, VnpHistoryDto>();
     } 
 }

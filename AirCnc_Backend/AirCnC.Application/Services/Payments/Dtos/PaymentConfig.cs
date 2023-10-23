@@ -1,18 +1,16 @@
-
-
 namespace AirCnC.Application.Services.Payments.Dtos
 {
     public class PaymentConfig
     {
-        public string VNPReturnURL { get; set; }
-        public string VNPUrl { get; set; }
-        public string VNPTmnCode { get; set; }
-        public string VNPHashSecret { get; set; }
+        public string VnpReturnUrl { get; set; } = null!;
+        public string VnpUrl { get; set; } = null!;
+        public string VnpTmnCode { get; set; } = null!;
+        public string VnpHashSecret { get; set; } = null!;
 
         public override string ToString()
         {
             return String.Format("PaymentInfo (VNPReturnURL={0}, VNPUrl={1}, VNPTmnCode={2}, VNPHashSecret={3}",
-                VNPReturnURL, VNPUrl, VNPTmnCode, VNPHashSecret);
+                VnpReturnUrl, VnpUrl, VnpTmnCode, VnpHashSecret);
         }
     }
 }

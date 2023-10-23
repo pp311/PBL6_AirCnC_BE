@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AirCnC.Domain.Entities.Base;
+﻿using AirCnC.Domain.Entities.Base;
+// ReSharper disable InconsistentNaming
 
 namespace AirCnC.Domain.Entities
 {
-    public class VNPHistory: EntityBase
+    public class VnpHistory: EntityBase
     {
         public long? vnp_TxnRef { get; set; }
 
@@ -33,7 +28,7 @@ namespace AirCnC.Domain.Entities
 
         public string? vnp_SecureHash { get; set; }
         public string? vnp_CreateDate { get; set; }
-        public BookingPayment BookingPayment { get; set; }
+        public BookingPayment BookingPayment { get; set; } = null!;
         public int BookingPaymentId { get; set; }
 
     }
