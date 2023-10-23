@@ -77,7 +77,7 @@ public static class SeedData
             .RuleFor(b => b.Value, f => f.Random.Int(1, 5))
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
             .RuleFor(b => b.CreatedAt, f => f.Date.Past())
-            .Generate(1000);
+            .Generate(500);
     }
 
     private static List<HostReview> GetHostReviews(List<Host> hosts, List<Guest> guests)
@@ -89,7 +89,7 @@ public static class SeedData
             .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
             .RuleFor(b => b.CreatedAt, f => f.Date.Past())
-            .Generate(500);
+            .Generate(300);
     }
 
     private static List<GuestReview> GetGuestReviews(List<Guest> guests, List<Host> hosts)
@@ -101,7 +101,7 @@ public static class SeedData
             .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
             .RuleFor(b => b.CreatedAt, f => f.Date.Past())
-            .Generate(500);
+            .Generate(300);
     }
 
     private static List<Booking> GetBookings(List<Property> properties,
@@ -122,7 +122,7 @@ public static class SeedData
             .RuleFor(b => b.CancellationPolicyType, f => f.PickRandom<CancellationPolicyType>())
             .RuleFor(b => b.Status, (f, b) => b.CheckOutDate < DateTime.UtcNow ? BookingStatus.Completed : f.PickRandom<BookingStatus>())
             .RuleFor(b => b.GuestId, f => f.PickRandom(users).Id)
-            .Generate(3000);
+            .Generate(500);
     }
 
     private static bool GetPropertyImages(List<Property> properties,
@@ -182,7 +182,7 @@ public static class SeedData
                 return user.Id;
             })
             .RuleFor(h => h.Id, f => f.IndexFaker + 1)
-            .Generate(50);
+            .Generate(20);
         return hosts;
     }
 
@@ -228,7 +228,7 @@ public static class SeedData
             .RuleFor(u => u.EmailConfirmed, _ => true)
             .RuleFor(u => u.SecurityStamp, _ => Guid.NewGuid().ToString())
             .RuleFor(u => u.PasswordHash , _ => new PasswordHasher<User>().HashPassword(null!, "User@123"))
-            .Generate(500);
+            .Generate(100);
     }
 
     private static List<IdentityRole<int>> GetDefaultRoles()
