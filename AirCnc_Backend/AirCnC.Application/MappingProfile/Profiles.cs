@@ -4,6 +4,7 @@ using AirCnC.Application.Services.Guests.Dtos;
 using AirCnC.Application.Services.Hosts.Dtos;
 using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Application.Services.Payments.Dtos;
+using AirCnC.Application.Services.Wishlists.Dtos;
 using AirCnC.Domain.Entities;
 using AutoMapper;
 
@@ -57,5 +58,7 @@ public class Profiles : Profile
         CreateMap<CreateBookingDto, Booking>();
         CreateMap<VnpHistoryDto, VnpHistory>();
         CreateMap<VnpHistory, VnpHistoryDto>();
+
+        CreateMap<Wishlist, WishlistsDto>();
     } 
 }
