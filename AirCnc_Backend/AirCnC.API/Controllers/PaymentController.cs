@@ -21,7 +21,7 @@ namespace AirCnC.API.Controllers
             return Ok(url);
         }
 
-        [HttpGet("vnpay-hook-url")]
+        [HttpPost("vnpay-hook-url")]
         public async Task<IActionResult> ReceiveDataFromVnp([FromQuery] VnPayReturnDto vnpayData)
         {
             await _paymentService.ReceiveDataFromVnp(vnpayData);

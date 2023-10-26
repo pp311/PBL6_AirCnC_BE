@@ -13,6 +13,7 @@ using AirCnC.Application.Services.Payments;
 using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Properties;
 using AirCnC.Application.Services.Reviews;
+using AirCnC.Application.Services.Wishlists;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Infrastructure.Cloudinary;
@@ -52,6 +53,7 @@ public static class ServiceExtensions
         services.AddScoped<IGuestService, GuestService>();
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IPaymentService, PaymentService>();
+        services.AddScoped<IWishlistService, WishlistService>();
         return services;
     }
 
