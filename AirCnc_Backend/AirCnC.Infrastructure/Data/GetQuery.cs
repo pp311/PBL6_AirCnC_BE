@@ -14,6 +14,10 @@ public static class GetQuery<TEntity> where TEntity : EntityBase
         
         // Check tracking
         query = specification.IsNoTracking ? query.AsNoTracking() : query.AsTracking();
+        
+        // Ignore query filters
+        if (specification.IsIgnoreQueryFilters)
+            query = query.IgnoreQueryFilters();
 
         // Filtering
         query = specification.Filters.Aggregate(

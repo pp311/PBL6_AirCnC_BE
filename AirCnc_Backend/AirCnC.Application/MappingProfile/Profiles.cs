@@ -2,7 +2,6 @@ using AirCnC.Application.Services.Auth.Dtos;
 using AirCnC.Application.Services.Bookings.Dtos;
 using AirCnC.Application.Services.Guests.Dtos;
 using AirCnC.Application.Services.Hosts.Dtos;
-using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Wishlists.Dtos;
 using AirCnC.Domain.Entities;

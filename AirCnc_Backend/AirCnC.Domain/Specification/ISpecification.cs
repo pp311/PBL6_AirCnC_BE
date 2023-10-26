@@ -22,4 +22,5 @@ public interface ISpecification<T>
     public int Take { get; }
     
     public int Skip { get; }
+    public bool IsIgnoreQueryFilters { get; }
 }
