@@ -12,6 +12,7 @@ public abstract class Specification<T> : ISpecification<T>
     public bool IsDescending { get; private set; }
     public int Take { get; private set; }
     public int Skip { get; private set; }
+    public bool IsIgnoreQueryFilters { get; private set; }
 
     public List<string> SearchFields { get; } = new();
     public string? SearchTerm { get; private set; }
@@ -38,4 +39,6 @@ public abstract class Specification<T> : ISpecification<T>
         Take = pageSize;
         Skip = (pageIndex - 1) * pageSize;
     }
+    
+    protected void ApplyIgnoreQueryFilters() => IsIgnoreQueryFilters = true;
 }
