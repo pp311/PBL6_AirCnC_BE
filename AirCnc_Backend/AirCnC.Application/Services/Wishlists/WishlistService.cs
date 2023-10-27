@@ -6,7 +6,6 @@ using AutoMapper;
 using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Application.Services.Properties.Specifications;
-using AirCnC.Application.Services.Wishlists.Dtos;
 using AirCnC.Application.Services.Wishlists.Specifications;
 using AirCnC.Domain.Exceptions;
 
