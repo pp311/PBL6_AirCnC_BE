@@ -29,7 +29,6 @@ public class PropertyService : IPropertyService
     private readonly IRepository<Property> _propertyRepository;
     private readonly IRepository<Host> _hostRepository;
     private readonly IRepository<Guest> _guestRepository;
-    private readonly IRepository<PropertyReview> _propertyReviewRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ICurrentUser _currentUser;
@@ -38,7 +37,6 @@ public class PropertyService : IPropertyService
                            IUnitOfWork unitOfWork, IMapper mapper,
                            ICurrentUser currentUser,
                            IRepository<Host> hostRepository,
-                           IRepository<PropertyReview> propertyReviewRepository,
                            IRepository<Guest> guestRepository)
     {
         _propertyRepository = propertyRepository;
@@ -46,7 +44,6 @@ public class PropertyService : IPropertyService
         _mapper = mapper;
         _currentUser = currentUser;
         _hostRepository = hostRepository;
-        _propertyReviewRepository = propertyReviewRepository;
         _guestRepository = guestRepository;
     }
 
@@ -66,7 +63,7 @@ public class PropertyService : IPropertyService
         
         foreach (var item in result)
         {
-            item.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == item.Id);
+            item.NumberOfReviews = propertyList.First(i => i.Id == item.Id).PropertyReviews.Count;
             if (item.NumberOfReviews == 0) continue;
             var property = propertyList.First(i => i.Id == item.Id);
             item.Rating = property.PropertyReviews
@@ -84,7 +81,7 @@ public class PropertyService : IPropertyService
                        ?? throw new EntityNotFoundException(nameof(Property), id.ToString());
         
         var result = _mapper.Map<GetPropertyDto>(property);
-        result.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == id);
+        result.NumberOfReviews = property.PropertyReviews.Count;
         if (result.NumberOfReviews == 0) return result;
         result.Rating = property.PropertyReviews
             .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
@@ -112,7 +109,7 @@ public class PropertyService : IPropertyService
 
         foreach (var item in result)
         {
-            item.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == item.Id);
+            item.NumberOfReviews = propertyList.First(i => i.Id == item.Id).PropertyReviews.Count;
             if (item.NumberOfReviews == 0) continue;
             var property = propertyList.First(i => i.Id == item.Id);
             item.Rating = property.PropertyReviews
