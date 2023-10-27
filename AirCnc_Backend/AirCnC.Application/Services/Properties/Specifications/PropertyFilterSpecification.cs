@@ -12,6 +12,7 @@ public class PropertyFilterSpecification : Specification<Property>
         AddInclude(p => p.PropertyImages);
         AddInclude(p => p.PropertyReviews);
         AddInclude(p => p.Host.User);
+        AddInclude(p => p.Wishlists);
         
         if (hostId > 0)
             AddFilter(p => p.HostId == hostId);

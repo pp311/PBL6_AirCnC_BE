@@ -1,6 +1,7 @@
 using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Commons.Specifications;
+using AirCnC.Application.Services.Properties.Specifications;
 using AirCnC.Application.Services.Reviews.Dtos;
 using AirCnC.Application.Services.Reviews.Specifications;
 using AirCnC.Domain.Constants;
@@ -20,7 +21,7 @@ public interface IReviewService
     Task<GetReviewDto> CreateHostReviewAsync(int hostId, CreateReviewDto dto);
     Task<GetReviewDto> CreateGuestReviewAsync(int guestId, CreateReviewDto dto);
     Task<GetPropertyReviewDto> CreatePropertyReviewAsync(int propertyId, CreatePropertyReviewDto dto);
-    
+    Task<PropertyReviewInfoDto> GetPropertyReviewInfoAsync(int propertyId);
     Task DeleteHostReviewAsync(int hostReviewId);
     Task DeleteGuestReviewAsync(int guestReviewId);
     Task DeletePropertyReviewAsync(int propertyReviewId);
@@ -59,6 +60,24 @@ public class ReviewService : IReviewService
         _currentUser = currentUser;
     }
 
+    public async Task<PropertyReviewInfoDto> GetPropertyReviewInfoAsync(int propertyId)
+    {
+        var property = await _propertyRepository.FindOneAsync(new PropertyDetailSpecification(propertyId))
+            ?? throw new EntityNotFoundException(nameof(Property), propertyId.ToString());
+        
+        var propertyReviewInfo = new PropertyReviewInfoDto
+        {
+            NumberOfReviews = property.PropertyReviews.Count,
+            Cleanliness = property.PropertyReviews.Average(r => r.Cleanliness),
+            Accuracy = property.PropertyReviews.Average(r => r.Accuracy),
+            Communication = property.PropertyReviews.Average(r => r.Communication),
+            CheckIn = property.PropertyReviews.Average(r => r.CheckIn),
+            Value = property.PropertyReviews.Average(r => r.Value),
+            Location = property.PropertyReviews.Average(r => r.Location)
+        };
+
+        return propertyReviewInfo;
+    }
 
     public async Task<PagedList<GetReviewDto>> GetHostReviewsAsync(int hostId, ReviewQueryParameters qp)
     {

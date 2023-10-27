@@ -41,6 +41,16 @@ public class ReviewController : ControllerBase
     }
     
     /// <summary>
+    /// Dùng để get điểm trung bình theo từng tiêu chí và số lượng review của một phòng
+    /// </summary>
+    [HttpGet("property/{propertyId}/info")]
+    public async Task<IActionResult> GetPropertyReviewInfo(int propertyId)
+    {
+        var result = await _reviewService.GetPropertyReviewInfoAsync(propertyId);
+        return Ok(result);
+    }
+    
+    /// <summary>
     /// Cần author để lấy guest id. Để tiện test nên chưa check xem guest đã từng ở phòng của host này hay ch
     /// </summary>
     [Authorize]

@@ -4,6 +4,8 @@ using AirCnC.Domain.Entities;
 using AirCnC.Application.Commons.Identity;
 using AutoMapper;
 using AirCnC.Application.Commons.Specifications;
+using AirCnC.Application.Services.Properties.Dtos;
+using AirCnC.Application.Services.Properties.Specifications;
 using AirCnC.Application.Services.Wishlists.Dtos;
 using AirCnC.Application.Services.Wishlists.Specifications;
 using AirCnC.Domain.Exceptions;
@@ -12,7 +14,7 @@ namespace AirCnC.Application.Services.Wishlists;
     
 public interface IWishlistService
 {
-    Task<PagedList<WishlistsDto>> GetListAsync(PagingParameters pg);
+    Task<PagedList<GetPropertyDto>> GetListAsync(PagingParameters pg);
     Task AddWishlistAsync(int propertyId);
     Task RemoveWishlistItemByIdAsync(int propertyId);
 }    
@@ -40,13 +42,18 @@ public class WishlistService : IWishlistService
 
     }
     
-    public async Task<PagedList<WishlistsDto>> GetListAsync(PagingParameters pg)
+    public async Task<PagedList<GetPropertyDto>> GetListAsync(PagingParameters pg)
     {
         var guest = await GetGuest(int.Parse(_currentUser.Id!));
         var specification = new WishlistByGuestIdSpecification(pg,guest.Id);
-        var(items, totalCount) = await _wishlistRepository.FindWithTotalCountAsync(specification);
-        var result = _mapper.Map<List<WishlistsDto>>(items);
-        return new PagedList<WishlistsDto>(result, totalCount, pg.PageIndex, pg.PageSize);
+        var items = await _wishlistRepository.FindListAsync(specification);
+        
+        var propertySpecification = new PropertiesByIdsSpecification(items.Select(w => w.PropertyId).ToList(), pg.PageIndex, pg.PageSize);
+        var (properties, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertySpecification);
+        
+        var result = _mapper.Map<List<GetPropertyDto>>(properties);
+        result.ForEach(item => item.IsFavorite = true);
+        return new PagedList<GetPropertyDto>(result, totalCount, pg.PageIndex, pg.PageSize);
     }
 
     public async Task AddWishlistAsync(int propertyId)
