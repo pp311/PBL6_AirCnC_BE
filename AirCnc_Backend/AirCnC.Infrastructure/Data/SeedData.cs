@@ -81,6 +81,7 @@ public static class SeedData
             .RuleFor(b => b.Value, f => f.Random.Int(1, 5))
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
             .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .RuleFor(b => b.LastModifiedAt, f => f.Date.Past())
             .Generate(500);
     }
 
@@ -94,6 +95,7 @@ public static class SeedData
             .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
             .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .RuleFor(b => b.LastModifiedAt, f => f.Date.Past())
             .Generate(300);
     }
 
@@ -107,6 +109,7 @@ public static class SeedData
             .RuleFor(b => b.Rating, f => f.Random.Int(1, 5))
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
             .RuleFor(b => b.CreatedAt, f => f.Date.Past())
+            .RuleFor(b => b.LastModifiedAt, f => f.Date.Past())
             .Generate(300);
     }
 

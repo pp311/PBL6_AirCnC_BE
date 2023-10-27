@@ -4,7 +4,7 @@ using AirCnC.Application.Commons;
 
 namespace AirCnC.Application.Services.Wishlists.Specifications
 {
-    public class WishlistByGuestIdSpecification: Specification<Wishlist>
+    public class WishlistByGuestIdSpecification : Specification<Wishlist>
     {
         public WishlistByGuestIdSpecification(PagingParameters pg, int guestId)
         {

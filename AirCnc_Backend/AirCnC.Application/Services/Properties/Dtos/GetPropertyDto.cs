@@ -13,6 +13,14 @@ namespace AirCnC.Application.Services.Properties.Dtos
         public int MaxAdultCount { get; set; }
         public int MaxChildCount { get; set; }
         
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        
+        public string Address { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        
+        public bool IsFavorite { get; set; }
+        
         public int HostId { get; set; }
         public string HostName { get; set; } = string.Empty;
         

@@ -28,6 +28,7 @@ public class PropertyService : IPropertyService
 {
     private readonly IRepository<Property> _propertyRepository;
     private readonly IRepository<Host> _hostRepository;
+    private readonly IRepository<Guest> _guestRepository;
     private readonly IRepository<PropertyReview> _propertyReviewRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -37,7 +38,8 @@ public class PropertyService : IPropertyService
                            IUnitOfWork unitOfWork, IMapper mapper,
                            ICurrentUser currentUser,
                            IRepository<Host> hostRepository,
-                           IRepository<PropertyReview> propertyReviewRepository)
+                           IRepository<PropertyReview> propertyReviewRepository,
+                           IRepository<Guest> guestRepository)
     {
         _propertyRepository = propertyRepository;
         _unitOfWork = unitOfWork;
@@ -45,6 +47,7 @@ public class PropertyService : IPropertyService
         _currentUser = currentUser;
         _hostRepository = hostRepository;
         _propertyReviewRepository = propertyReviewRepository;
+        _guestRepository = guestRepository;
     }
 
     public async Task<PagedList<GetPropertyDto>> GetListByHostIdAsync(int hostId, PropertyQueryParameters pqp)
@@ -53,17 +56,22 @@ public class PropertyService : IPropertyService
         var propertyFilterSpec = new PropertyFilterSpecification(pqp, hostId);
 
         var (items, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertyFilterSpec);
+        var propertyList = items.ToList();
 
         var result = _mapper.Map<List<GetPropertyDto>>(items);
         
-        // Todo: Optimize this
+        var currentGuestId = 0;
+        if (!string.IsNullOrWhiteSpace(_currentUser.Id))
+            currentGuestId = _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))).Id;
+        
         foreach (var item in result)
         {
             item.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == item.Id);
             if (item.NumberOfReviews == 0) continue;
-            item.Rating = await _propertyReviewRepository
-                .AverageAsync(new PropertyReviewSpecification(item.Id),
-                    r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+            var property = propertyList.First(i => i.Id == item.Id);
+            item.Rating = property.PropertyReviews
+                .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+            item.IsFavorite  = propertyList.Any(i => i.Id == item.Id && i.Wishlists.Any(w => w.GuestId == currentGuestId));
         }
 
         return new PagedList<GetPropertyDto>(result, totalCount, pqp.PageIndex, pqp.PageSize);
@@ -78,9 +86,12 @@ public class PropertyService : IPropertyService
         var result = _mapper.Map<GetPropertyDto>(property);
         result.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == id);
         if (result.NumberOfReviews == 0) return result;
-        result.Rating = await _propertyReviewRepository
-                                .AverageAsync(new PropertyReviewSpecification(id), 
-                                    r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+        result.Rating = property.PropertyReviews
+            .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+        
+        if (string.IsNullOrWhiteSpace(_currentUser.Id)) return result;
+        var currentGuestId = _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))).Id;
+        result.IsFavorite = property.Wishlists.Any(w => w.GuestId == currentGuestId);
         return result;
     }
 
@@ -89,17 +100,24 @@ public class PropertyService : IPropertyService
         var propertyFilterSpec = new PropertyFilterSpecification(pqp);
 
         var (items, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertyFilterSpec);
-
-        var result = _mapper.Map<List<GetPropertyDto>>(items);
         
-        // Todo: Optimize this
+        var propertyList = items.ToList();
+
+        var result = _mapper.Map<List<GetPropertyDto>>(propertyList);
+
+        // Neu user da dang nhap thi moi check xem property co phai la favorite cua user hay khong
+        var currentGuestId = 0;
+        if (!string.IsNullOrWhiteSpace(_currentUser.Id))
+            currentGuestId = _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))).Id;
+
         foreach (var item in result)
         {
             item.NumberOfReviews = await _propertyReviewRepository.CountAsync(r => r.PropertyId == item.Id);
             if (item.NumberOfReviews == 0) continue;
-            item.Rating = await _propertyReviewRepository
-                .AverageAsync(new PropertyReviewSpecification(item.Id),
-                    r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+            var property = propertyList.First(i => i.Id == item.Id);
+            item.Rating = property.PropertyReviews
+                .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+            item.IsFavorite  = propertyList.Any(i => i.Id == item.Id && i.Wishlists.Any(w => w.GuestId == currentGuestId));
         }
 
         return new PagedList<GetPropertyDto>(result, totalCount, pqp.PageIndex, pqp.PageSize);
