@@ -3,7 +3,6 @@ using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Application.Services.Properties.Specifications;
-using AirCnC.Application.Services.Reviews.Specifications;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Enums;
@@ -59,7 +58,7 @@ public class PropertyService : IPropertyService
         
         var currentGuestId = 0;
         if (!string.IsNullOrWhiteSpace(_currentUser.Id))
-            currentGuestId = _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))).Id;
+            currentGuestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))))!.Id;
         
         foreach (var item in result)
         {
@@ -87,7 +86,7 @@ public class PropertyService : IPropertyService
             .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
         
         if (string.IsNullOrWhiteSpace(_currentUser.Id)) return result;
-        var currentGuestId = _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))).Id;
+        var currentGuestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))))!.Id;
         result.IsFavorite = property.Wishlists.Any(w => w.GuestId == currentGuestId);
         return result;
     }
@@ -105,7 +104,7 @@ public class PropertyService : IPropertyService
         // Neu user da dang nhap thi moi check xem property co phai la favorite cua user hay khong
         var currentGuestId = 0;
         if (!string.IsNullOrWhiteSpace(_currentUser.Id))
-            currentGuestId = _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))).Id;
+            currentGuestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))))!.Id;
 
         foreach (var item in result)
         {
@@ -114,7 +113,7 @@ public class PropertyService : IPropertyService
             var property = propertyList.First(i => i.Id == item.Id);
             item.Rating = property.PropertyReviews
                 .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
-            item.IsFavorite  = propertyList.Any(i => i.Id == item.Id && i.Wishlists.Any(w => w.GuestId == currentGuestId));
+            item.IsFavorite = propertyList.Any(i => i.Id == item.Id && i.Wishlists.Any(w => w.GuestId == currentGuestId));
         }
 
         return new PagedList<GetPropertyDto>(result, totalCount, pqp.PageIndex, pqp.PageSize);
