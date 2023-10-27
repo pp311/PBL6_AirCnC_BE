@@ -51,7 +51,19 @@ public class WishlistService : IWishlistService
         var propertySpecification = new PropertiesByIdsSpecification(items.Select(w => w.PropertyId).ToList(), pg.PageIndex, pg.PageSize);
         var (properties, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertySpecification);
         
-        var result = _mapper.Map<List<GetPropertyDto>>(properties);
+        var propertyList = properties.ToList();
+
+        var result = _mapper.Map<List<GetPropertyDto>>(propertyList);
+
+        foreach (var item in result)
+        {
+            item.NumberOfReviews = propertyList.First(i => i.Id == item.Id).PropertyReviews.Count;
+            if (item.NumberOfReviews == 0) continue;
+            var property = propertyList.First(i => i.Id == item.Id);
+            item.Rating = property.PropertyReviews
+                .Average(r => (r.Accuracy + r.Communication + r.Cleanliness + r.Location + r.CheckIn + r.Value) / 6.0);
+        }
+        
         result.ForEach(item => item.IsFavorite = true);
         return new PagedList<GetPropertyDto>(result, totalCount, pg.PageIndex, pg.PageSize);
     }
