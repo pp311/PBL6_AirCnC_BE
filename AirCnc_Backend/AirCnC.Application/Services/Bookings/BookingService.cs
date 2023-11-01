@@ -98,7 +98,7 @@ public class BookingService : IBookingService
         _bookingRepository.Add(booking);
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Booking created {@Booking}", booking);
-        
+
         // Map booking to dto
         return _mapper.Map<GetDraftBookingDto>(booking);
     }
@@ -145,7 +145,7 @@ public class BookingService : IBookingService
             throw new InvalidBookingDateException($"Stay duration must be less than {_airCnCSettings.MaxStayDuration} days");
 
         // Check if property is available for booking
-        var isPropertyAlreadyBusy = await _bookingRepository.AnyAsync(new ActiveBookingBetweenDatesSpecification(createBookingDto.CheckInDate, createBookingDto.CheckOutDate));
+        var isPropertyAlreadyBusy = await _bookingRepository.AnyAsync(new ActiveBookingBetweenDatesSpecification(createBookingDto.PropertyId, createBookingDto.CheckInDate, createBookingDto.CheckOutDate));
         if (isPropertyAlreadyBusy)
             throw new InvalidBookingDateException("Property is not available for booking");
 
