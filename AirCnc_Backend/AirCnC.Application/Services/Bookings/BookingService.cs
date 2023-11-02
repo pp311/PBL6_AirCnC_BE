@@ -19,7 +19,6 @@ public interface IBookingService
     Task<GetDraftBookingDto> CreateBookingAsync(CreateBookingDto createBookingDto);
     Task<List<GetBookingForPropertyDto>> GetBookingsForPropertyAsync(int propertyId, DateTime fromDate, DateTime toDate);
     Task ChangeBookingStatusAsync(int bookingId, BookingStatus status);
-
 }
 
 public class BookingService : IBookingService
@@ -92,7 +91,7 @@ public class BookingService : IBookingService
         // Calculate total price
         var numberOfDays = (booking.CheckOutDate.Date - booking.CheckInDate.Date).Days;
         var stayPrice = booking.PricePerNight * numberOfDays;
-        booking.TotalPrice = stayPrice + booking.CleaningFee + stayPrice * booking.SystemFee;
+        booking.TotalPrice = stayPrice + booking.CleaningFee;
 
         // Save booking
         _bookingRepository.Add(booking);

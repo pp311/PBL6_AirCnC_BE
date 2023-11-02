@@ -20,6 +20,7 @@ public class GetBookingForGuestDto
     public DateTime CheckOutDate { get; set; }
     public int NumberOfDays { get; set; }
     public double PricePerNight { get; set; }
+    public double CleaningFee { get; set; }
     public double TotalPrice { get; set; }
     
     public int NumberOfAdults { get; set; }
