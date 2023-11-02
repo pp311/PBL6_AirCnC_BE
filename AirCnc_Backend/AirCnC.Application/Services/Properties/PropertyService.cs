@@ -134,6 +134,8 @@ public class PropertyService : IPropertyService
 
         // Create property as pending
         var property = _mapper.Map<Property>(upsertPropertyDto);
+        var propertyUtilities = _mapper.Map<PropertyUtility>(upsertPropertyDto.PropertyUtilities);
+        property.PropertyUtilities.Add(propertyUtilities);
         property.Status = PropertyStatus.Pending;
         host.Properties.Add(property);
 
@@ -187,7 +189,8 @@ public class PropertyMapping : Profile
             .ForMember(dto => dto.HostName, opt => opt.MapFrom(src => src.Host.User.FullName));
         CreateMap<PropertyImage, GetPropertyImageDto>();
         CreateMap<PropertyUtility, GetPropertyUtilityDto>();
-        CreateMap<UpsertPropertyDto,Property>();
+        CreateMap<UpsertPropertyDto, Property>()
+            .ForMember(p => p.PropertyUtilities, opt => opt.Ignore());
         CreateMap<UpsertPropertyImageDto, PropertyImage>();
         CreateMap<PropertyUtilityDto, PropertyUtility>();
     }

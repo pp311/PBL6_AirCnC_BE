@@ -55,7 +55,7 @@ public class PaymentService : IPaymentService
         VnpHistoryDto vnpHistoryDto = new VnpHistoryDto();
         vnpHistoryDto.vnp_TxnRef = DateTime.UtcNow.Ticks;
         vnpHistoryDto.vnp_OrderInfo = "#" + vnpHistoryDto.vnp_TxnRef + " | " + "Thanh toan dat phong #" + booking.Id;
-        vnpHistoryDto.vnp_Amount = (long)booking.TotalPrice;
+        vnpHistoryDto.vnp_Amount = (long)booking.TotalPrice*1000;
         vnpHistoryDto.vnp_BankCode = createBookingPaymentDto.BankCode!;
         vnpHistoryDto.vnp_TmnCode = _paymentConfig.VnpTmnCode;
         //vnpHistoryDTO.BookingPaymentId= createBookingPaymentDto.BookingId;
@@ -137,7 +137,7 @@ public class PaymentService : IPaymentService
                 
                 var booking = await _bookingRepository.GetByIdAsync(vnpHistory.BookingPayment.BookingId);
                 booking!.Status = BookingStatus.Confirmed;
-                
+                booking.Guid = Guid.NewGuid().ToString();
                 await _unitOfWork.SaveChangesAsync();
             }
             else
