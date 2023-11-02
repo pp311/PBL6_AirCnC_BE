@@ -2,30 +2,24 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+namespace AirCnC.API.Controllers;
 
-namespace AirCnC.API.Controllers
+[Route("api/check-in")]
+[ApiController]
+public class CheckInController : ControllerBase
 {
-    [Route("api/Checkin")]
-    [ApiController]
-    public class CheckInController : ControllerBase
+    private readonly ICheckInService _checkInService;
+
+    public CheckInController(ICheckInService checkInService)
     {
-        private readonly ICheckInService _checkInService;
+        _checkInService = checkInService;
+    }
 
-        public CheckInController(ICheckInService checkInService)
-        {
-            _checkInService = checkInService;
-        }
-
-
-
-        [HttpPut("{guid}")]
-        [Authorize]
-        public async Task<IActionResult> Put(string guid)
-        {
-            await _checkInService.CheckInAsync(guid);
-            return Ok();
-        }
-
+    [HttpPost("{code:guid}")]
+    [Authorize]
+    public async Task<IActionResult> CheckIn(Guid code)
+    {
+        await _checkInService.CheckInAsync(code);
+        return Ok();
     }
 }

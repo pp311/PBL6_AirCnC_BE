@@ -25,4 +25,5 @@ public class GetBookingForGuestDto
     public int NumberOfAdults { get; set; }
     public int NumberOfChildren { get; set; }
     public string? Note { get; set; }
+    public string? CheckInCode { get; set; }
 }

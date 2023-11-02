@@ -8,7 +8,6 @@ using AirCnC.Domain.Entities;
 using AirCnC.Domain.Enums;
 using AirCnC.Domain.Exceptions;
 using AutoMapper;
-using AutoMapper.Configuration.Annotations;
 
 namespace AirCnC.Application.Services.Properties;
 
