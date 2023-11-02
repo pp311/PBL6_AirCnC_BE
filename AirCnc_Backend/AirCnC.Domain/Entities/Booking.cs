@@ -35,4 +35,5 @@ public class Booking : EntityBase
     
     public int? HostPaymentId { get; set; }
     public HostPayment? HostPayment { get; set; }
+    public string? Guid { get; set; }
 }
