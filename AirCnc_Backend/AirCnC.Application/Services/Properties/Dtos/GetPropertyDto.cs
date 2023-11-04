@@ -30,6 +30,7 @@ namespace AirCnC.Application.Services.Properties.Dtos
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public double PricePerNight { get; set; }
+        public double CleaningFee { get; set; } 
         
         public ICollection<GetPropertyImageDto>? PropertyImages { get; set; }
         

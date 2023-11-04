@@ -63,7 +63,7 @@ namespace AirCnC.Application.Services.Properties.Dtos
         public ICollection<UpsertPropertyImageDto> PropertyImages { get; set; } = new List<UpsertPropertyImageDto>();
         
         [Required]
-        public ICollection<PropertyUtilityDto> PropertyUtilities { get; set; } = new List<PropertyUtilityDto>();
+        public PropertyUtilityDto PropertyUtilities { get; set; } = new PropertyUtilityDto();
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [EnumDataType(typeof(PropertyStatus))]

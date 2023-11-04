@@ -117,10 +117,10 @@ public static class SeedData
                                              List<User> users)
     {
         return new Faker<Booking>()
-            .RuleFor(b => b.CleaningFee, f => f.Random.Double(10, 25))
-            .RuleFor(b => b.PricePerNight, f => f.Random.Double(10, 100))
+            .RuleFor(p => p.PricePerNight, f => f.Random.Int(100, 50000) * 1000)
+            .RuleFor(p => p.CleaningFee, f => f.Random.Int(30, 350) * 1000)
             .RuleFor(b => b.PropertyId, f => f.PickRandom(properties).Id)
-            .RuleFor(b => b.SystemFee, f => f.Random.Double(10, 25))
+            .RuleFor(b => b.SystemFee, _ => 10)
             .RuleFor(b => b.CheckInDate,
                 f => f.Date.Between(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow.AddYears(1)).Date)
             .RuleFor(b => b.CheckOutDate, (f,

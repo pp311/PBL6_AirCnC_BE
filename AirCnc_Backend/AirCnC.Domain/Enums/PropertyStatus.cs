@@ -5,6 +5,8 @@ namespace AirCnC.Domain.Enums
     {
         Pending = 1,
         Approved,
-        Rejected
+        Rejected,
+        Available,
+        Unavailable
     }
 }

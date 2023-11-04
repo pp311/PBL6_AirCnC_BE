@@ -31,27 +31,27 @@ public class Profiles : Profile
             .ForMember(dto => dto.City, opt => opt.MapFrom(h => h.User.City))
             .ForMember(dto => dto.JoinedAt, opt => opt.MapFrom(h => h.CreatedAt));
         
-        
-         
-        
-
         CreateMap<Booking, GetBookingForHostDto>()
             .ForMember(dto => dto.GuestName, opt => opt.MapFrom(b => b.Guest.User.FullName))
             .ForMember(dto => dto.GuestEmail, opt => opt.MapFrom(b => b.Guest.User.Email))
             .ForMember(dto => dto.GuestPhoneNumber, opt => opt.MapFrom(b => b.Guest.User.PhoneNumber))
             .ForMember(dto => dto.PropertyName, opt => opt.MapFrom(b => b.Property.Title))
-            .ForMember(dto => dto.NumberOfDays, opt => opt.MapFrom(b => b.CheckOutDate.Subtract(b.CheckInDate).Days));
+            .ForMember(dto => dto.NumberOfDays, opt => opt.MapFrom(b => b.CheckOutDate.Subtract(b.CheckInDate).Days))
+            .ForMember(dto => dto.CleaningFee, opt => opt.MapFrom(b => b.Property.CleaningFee));    
         
         CreateMap<Booking, GetBookingForGuestDto>()
             .ForMember(dto => dto.HostName, opt => opt.MapFrom(b => b.Property.Host.User.FullName))
             .ForMember(dto => dto.HostEmail, opt => opt.MapFrom(b => b.Property.Host.User.Email))
             .ForMember(dto => dto.HostPhoneNumber, opt => opt.MapFrom(b => b.Property.Host.User.PhoneNumber))
             .ForMember(dto => dto.PropertyName, opt => opt.MapFrom(b => b.Property.Title))
-            .ForMember(dto => dto.NumberOfDays, opt => opt.MapFrom(b => b.CheckOutDate.Subtract(b.CheckInDate).Days));
+            .ForMember(dto => dto.NumberOfDays, opt => opt.MapFrom(b => b.CheckOutDate.Subtract(b.CheckInDate).Days))
+            .ForMember(dto => dto.CheckInCode, opt => opt.MapFrom(b => b.Guid))
+            .ForMember(dto => dto.CleaningFee, opt => opt.MapFrom(b => b.Property.CleaningFee));
         
         CreateMap<Booking, GetDraftBookingDto>()
             .ForMember(dto => dto.PropertyName, opt => opt.MapFrom(b => b.Property.Title))
-            .ForMember(dto => dto.NumberOfDays, opt => opt.MapFrom(b => b.CheckOutDate.Subtract(b.CheckInDate).Days));
+            .ForMember(dto => dto.NumberOfDays, opt => opt.MapFrom(b => b.CheckOutDate.Subtract(b.CheckInDate).Days))
+            .ForMember(dto => dto.CleaningFee, opt => opt.MapFrom(b => b.Property.CleaningFee));
 
         CreateMap<Booking, GetBookingForPropertyDto>();
         CreateMap<CreateBookingDto, Booking>();
