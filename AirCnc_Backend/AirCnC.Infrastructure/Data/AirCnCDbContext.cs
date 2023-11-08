@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using AirCnC.Application.Commons.Identity;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Entities.Base;
 using Microsoft.AspNetCore.Identity;
@@ -9,8 +10,10 @@ namespace AirCnC.Infrastructure.Data;
 
 public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
-    public AirCnCDbContext(DbContextOptions<AirCnCDbContext> options) : base(options)
+    private readonly ICurrentUser _currentUser;
+    public AirCnCDbContext(DbContextOptions<AirCnCDbContext> options, ICurrentUser currentUser) : base(options)
     {
+        _currentUser = currentUser;
     }
     
     public DbSet<Booking> Bookings { get; set; } = null!;
@@ -72,14 +75,14 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
             switch (entry.State)
             {
                 case EntityState.Added:
-                    // entry.Entity.CreatedBy = _currentUser.Id;
+                    entry.Entity.CreatedBy = int.TryParse(_currentUser.Id, out var id) ? id : 0;
                     entry.Entity.CreatedAt = DateTime.UtcNow;
                     entry.Entity.LastModifiedAt = DateTime.UtcNow;
                     entry.Entity.IsDeleted = false;
                     break;
 
                 case EntityState.Modified:
-                    // entry.Entity.LastModifiedBy = _currentUser.Id;
+                    entry.Entity.LastModifiedBy = int.TryParse(_currentUser.Id, out var id2) ? id2 : 0;
                     entry.Entity.LastModifiedAt = DateTime.UtcNow;
                     break;
 
