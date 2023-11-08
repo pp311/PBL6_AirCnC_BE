@@ -15,6 +15,7 @@ namespace AirCnC.Application.Services.Users
     {
         Task<GetUserForAdminDto> GetUserAsync(int id);
         Task<PagedList<GetUserForAdminDto>> GetUsersAsync(PagingParameters pp);
+        Task<GetUserForAdminDto> UpdateUserAsync(int id, UpdateUserInfoDto dto);
     }
 
     public class UserService : IUserService
@@ -72,6 +73,23 @@ namespace AirCnC.Application.Services.Users
                 user.IsHost = users.FirstOrDefault(u => u.Id == user.Id)?.Host is not null;
             
             return new PagedList<GetUserForAdminDto>(result, totalCount, pp.PageIndex, pp.PageSize);
+        }
+
+        public async Task<GetUserForAdminDto> UpdateUserAsync(int id, UpdateUserInfoDto dto)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Host)
+                .Include(u => u.Guest)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            if (user is null)
+                throw new EntityNotFoundException(nameof(User), id.ToString());
+
+            _mapper.Map(dto, user);
+            await _unitOfWork.SaveChangesAsync();
+
+            var result = _mapper.Map<GetUserForAdminDto>(user);
+            result.IsHost = user.Host is not null;
+            return result;
         }
     }
 

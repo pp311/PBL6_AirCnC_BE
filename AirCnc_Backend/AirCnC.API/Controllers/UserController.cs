@@ -1,5 +1,6 @@
 using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Users;
+using AirCnC.Application.Services.Users.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers;
@@ -27,6 +28,13 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserList([FromQuery] PagingParameters pqp)
     {
         var result = await _userService.GetUsersAsync(pqp);
+        return Ok(result);
+    }
+    
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateUser(int id, UpdateUserInfoDto dto)
+    {
+        var result = await _userService.UpdateUserAsync(id, dto);
         return Ok(result);
     }
 }

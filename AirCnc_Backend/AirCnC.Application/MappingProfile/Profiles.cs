@@ -69,5 +69,7 @@ public class Profiles : Profile
 
         CreateMap<User, GetUserForAdminDto>()
             .ForMember(dto => dto.CreatedAt, opt => opt.MapFrom(u => u.Guest.CreatedAt));
+
+        CreateMap<UpdateUserInfoDto, User>();
     } 
 }
