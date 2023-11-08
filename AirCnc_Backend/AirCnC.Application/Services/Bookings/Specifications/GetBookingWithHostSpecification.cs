@@ -5,9 +5,9 @@ namespace AirCnC.Application.Services.Bookings.Specifications;
 
 public class GetBookingWithHostSpecification : Specification<Booking>
 {
-    public GetBookingWithHostSpecification(int HostId)
+    public GetBookingWithHostSpecification(int hostId)
     {
-        AddFilter(b=>b.Property.HostId==HostId);
+        AddFilter(b => b.Property.HostId == hostId);
     }
     
 }

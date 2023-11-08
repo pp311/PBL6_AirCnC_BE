@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AirCnC.Application.Services.Hosts.Dtos
+﻿namespace AirCnC.Application.Services.Hosts.Dtos
 {
     public class GetHostForAdminDto
     {

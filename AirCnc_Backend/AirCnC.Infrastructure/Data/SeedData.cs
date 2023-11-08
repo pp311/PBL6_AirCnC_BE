@@ -138,6 +138,7 @@ public static class SeedData
                                                ? BookingStatus.Completed
                                                : f.PickRandom<BookingStatus>())
             .RuleFor(b => b.GuestId, f => f.PickRandom(users).Id)
+            .RuleFor(b => b.Guid, _ => Guid.NewGuid().ToString())
             .Generate(500);
     }
 

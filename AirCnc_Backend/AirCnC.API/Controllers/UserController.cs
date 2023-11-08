@@ -6,7 +6,7 @@ namespace AirCnC.API.Controllers;
 
 [ApiController]
 
-[Route("api/Users")]
+[Route("api/users")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;

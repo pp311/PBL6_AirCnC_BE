@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text;
-using System.Threading.Tasks;
-using AirCnC.Application.Commons;
+﻿using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Users.Dtos;
 using AirCnC.Application.Services.Users.Specifications;
@@ -47,7 +41,7 @@ namespace AirCnC.Application.Services.Users
 
             var totalCount=users.Count;
             if (users is null)
-                throw new EntityNotFoundException(nameof(Domain.Entities.User), pp.PageIndex.ToString());
+                throw new EntityNotFoundException(nameof(User), pp.PageIndex.ToString());
             var result = _mapper.Map<List<GetUserForAdminDto>>(users);
             foreach (var user in result)
             {
