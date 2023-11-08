@@ -16,6 +16,13 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetUser(int id)
+    {
+        var result = await _userService.GetUserAsync(id);
+        return Ok(result);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetUserList([FromQuery] PagingParameters pqp)
     {

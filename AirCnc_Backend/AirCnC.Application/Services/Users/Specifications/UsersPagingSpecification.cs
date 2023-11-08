@@ -9,7 +9,9 @@ namespace AirCnC.Application.Services.Users.Specifications
 
         public UsersPagingSpecification(PagingParameters pp)
         {
-            ApplyPaging(pp.PageIndex,pp.PageSize);
+            if (pp.IsDescending)
+                ApplyDescending();
+            ApplyPaging(pp.PageIndex, pp.PageSize);
         }
     }
 }
