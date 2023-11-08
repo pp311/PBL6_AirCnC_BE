@@ -23,5 +23,6 @@ namespace AirCnC.Domain.Data
         Task<bool> AnyAsync(int id);
         
         Task<(IEnumerable<T>, int)> FindWithTotalCountAsync(ISpecification<T> specification);
+        Task<double> SumAsync(ISpecification<T> spec, Expression<Func<T, double>> selector);
     }
 }

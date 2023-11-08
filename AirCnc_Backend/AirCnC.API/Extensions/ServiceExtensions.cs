@@ -5,6 +5,7 @@ using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.Bookings;
+using AirCnC.Application.Services.Cancellations;
 using AirCnC.Application.Services.CheckIn;
 using AirCnC.Application.Services.Email;
 using AirCnC.Application.Services.Guests;
@@ -14,6 +15,7 @@ using AirCnC.Application.Services.Payments;
 using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Properties;
 using AirCnC.Application.Services.Reviews;
+using AirCnC.Application.Services.Users;
 using AirCnC.Application.Services.Wishlists;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
@@ -56,6 +58,9 @@ public static class ServiceExtensions
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IWishlistService, WishlistService>();
         services.AddScoped<ICheckInService,CheckInService>();
+        services.AddScoped<IUserService,UserService>();
+        services.AddScoped<ICancellationService, CancellationService>();
+
         return services;
     }
 
