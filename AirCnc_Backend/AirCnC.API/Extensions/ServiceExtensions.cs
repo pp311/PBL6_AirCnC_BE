@@ -15,6 +15,7 @@ using AirCnC.Application.Services.Payments;
 using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Properties;
 using AirCnC.Application.Services.Reviews;
+using AirCnC.Application.Services.Users;
 using AirCnC.Application.Services.Wishlists;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
@@ -57,7 +58,9 @@ public static class ServiceExtensions
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IWishlistService, WishlistService>();
         services.AddScoped<ICheckInService,CheckInService>();
+        services.AddScoped<IUserService,UserService>();
         services.AddScoped<ICancellationService, CancellationService>();
+
         return services;
     }
 

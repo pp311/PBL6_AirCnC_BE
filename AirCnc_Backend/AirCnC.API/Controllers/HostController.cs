@@ -1,3 +1,4 @@
+using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Hosts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,5 +20,11 @@ public class HostController : ControllerBase
     {
         var host = await _hostService.GetHostAsync(id);
         return Ok(host);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetHostAsync([FromQuery] PagingParameters pp)
+    {
+        var hosts = await _hostService.GetHostsAsync(pp);
+        return Ok(hosts);
     }
 }

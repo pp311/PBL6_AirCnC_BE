@@ -1,11 +1,12 @@
-using AirCnC.Application.Services.Auth.Dtos;
 using AirCnC.Application.Services.Bookings.Dtos;
 using AirCnC.Application.Services.Guests.Dtos;
 using AirCnC.Application.Services.Hosts.Dtos;
 using AirCnC.Application.Services.Payments.Dtos;
+using AirCnC.Application.Services.Users.Dtos;
 using AirCnC.Application.Services.Wishlists.Dtos;
 using AirCnC.Domain.Entities;
 using AutoMapper;
+using  AirCnC.Application.Services.Auth.Dtos;
 
 namespace AirCnC.Application.MappingProfile;
 
@@ -59,5 +60,13 @@ public class Profiles : Profile
         CreateMap<VnpHistory, VnpHistoryDto>();
 
         CreateMap<Wishlist, WishlistsDto>();
+
+        CreateMap<Host,GetHostForAdminDto>()
+            .ForMember(dto => dto.Name, opt => opt.MapFrom(h => h.User.FullName))
+            .ForMember(dto => dto.Address, opt => opt.MapFrom(h => h.User.Address))
+            .ForMember(dto => dto.City, opt => opt.MapFrom(h => h.User.City))
+            .ForMember(dto => dto.JoinedAt, opt => opt.MapFrom(h => h.CreatedAt));
+
+        CreateMap<User, GetUserForAdminDto>();
     } 
 }

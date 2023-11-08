@@ -66,4 +66,6 @@ public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : Enti
         var data = await query.Skip(specification.Skip).Take(specification.Take).ToListAsync();
         return (data, count);
     }
+    public async Task<double> SumAsync(ISpecification<TEntity> spec, Expression<Func<TEntity, double>> selector)
+        => await GetQuery<TEntity>.From(DbSet, spec).SumAsync(selector);
 }
