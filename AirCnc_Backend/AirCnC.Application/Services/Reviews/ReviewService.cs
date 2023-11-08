@@ -209,12 +209,12 @@ public class ReviewService : IReviewService
         
         // Check if user has permission to delete this review
         var currentUserId = int.Parse(_currentUser.Id!);
-        var currentUserRole = _currentUser.Role!;
+        var currentUserRole = _currentUser.Role ?? throw new Exception("User role is null");
 
-        if (currentUserRole != AppRole.Admin)
+        if (!string.Equals(currentUserRole, AppRole.Admin, StringComparison.CurrentCultureIgnoreCase))
         {
-            var guestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(currentUserId)))!.Id;
-            if (hostReview.GuestId != guestId) throw new ForbiddenAccessException("You are not the owner of this review");
+            var guest = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(currentUserId));
+            if (hostReview.GuestId != guest?.Id) throw new ForbiddenAccessException("You are not the owner of this review");
         }
         
         _hostReviewRepository.Delete(hostReview);
@@ -247,12 +247,13 @@ public class ReviewService : IReviewService
         
         // Check if user has permission to delete this review
         var currentUserId = int.Parse(_currentUser.Id!);
-        var currentUserRole = _currentUser.Role!;
+        var currentUserRole = _currentUser.Role;
 
         if (currentUserRole != AppRole.Admin)
         {
             var hostId = (await _hostRepository.FindOneAsync(new HostByUserIdSpecification(currentUserId)))!.Id;
-            if (propertyReview.Property.HostId != hostId) throw new ForbiddenAccessException("You are not the owner of this review");
+            if (propertyReview.Property.HostId != hostId) 
+                throw new ForbiddenAccessException("You are not the owner of this review");
         }
         
         _propertyReviewRepository.Delete(propertyReview);
