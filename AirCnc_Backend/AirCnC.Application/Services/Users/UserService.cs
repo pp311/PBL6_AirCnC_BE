@@ -13,6 +13,7 @@ namespace AirCnC.Application.Services.Users
 {
     public interface IUserService
     {
+        Task<GetUserForAdminDto> GetUserAsync(int id);
         Task<PagedList<GetUserForAdminDto>> GetUsersAsync(PagingParameters pp);
     }
 
@@ -31,23 +32,46 @@ namespace AirCnC.Application.Services.Users
             _hostRepository = hostRepository;
             _unitOfWork = unitOfWork;
         }
+        
+        public async Task<GetUserForAdminDto> GetUserAsync(int id)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Host)
+                .Include(u => u.Guest)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            if (user is null)
+                throw new EntityNotFoundException(nameof(User), id.ToString());
 
-
+            var result = _mapper.Map<GetUserForAdminDto>(user);
+            result.IsHost = user.Host is not null;
+            return result;
+        }
 
         public async Task<PagedList<GetUserForAdminDto>> GetUsersAsync(PagingParameters pp)
         {
-            var spec=new UsersPagingSpecification(pp);
-            var users = await _userManager.Users.Skip(spec.Skip).Take(spec.Take).ToListAsync();
+            var skip = (pp.PageIndex - 1) * pp.PageSize;
+            var take = pp.PageSize;
+            
+            var adminIds = (await _userManager.GetUsersInRoleAsync("Admin")).Select(x => x.Id);
+            
+            var users = await _userManager.Users
+                            .Include(u => u.Host)
+                            .Include(u => u.Guest)
+                            .Where(u => adminIds.All(id => id != u.Id))
+                            .OrderBy(i => pp.IsDescending ? -i.Id : i.Id)
+                            .Skip(skip)
+                            .Take(take)
+                            .ToListAsync();
+            
+            var totalCount = await _userManager.Users
+                            .Where(u => adminIds.All(id => id != u.Id))
+                            .CountAsync();
 
-            var totalCount=users.Count;
-            if (users is null)
-                throw new EntityNotFoundException(nameof(User), pp.PageIndex.ToString());
             var result = _mapper.Map<List<GetUserForAdminDto>>(users);
             foreach (var user in result)
-            {
-                user.IsHost = await _hostRepository.AnyAsync(new HostByUserIdSpecification(int.Parse(user.Id)));
-            }
-            return new PagedList<GetUserForAdminDto>(result,totalCount,pp.PageIndex,pp.PageSize);
+                user.IsHost = users.FirstOrDefault(u => u.Id == user.Id)?.Host is not null;
+            
+            return new PagedList<GetUserForAdminDto>(result, totalCount, pp.PageIndex, pp.PageSize);
         }
     }
 

@@ -61,12 +61,13 @@ public class Profiles : Profile
 
         CreateMap<Wishlist, WishlistsDto>();
 
-        CreateMap<Host,GetHostForAdminDto>()
+        CreateMap<Host, GetHostForAdminDto>()
             .ForMember(dto => dto.Name, opt => opt.MapFrom(h => h.User.FullName))
             .ForMember(dto => dto.Address, opt => opt.MapFrom(h => h.User.Address))
             .ForMember(dto => dto.City, opt => opt.MapFrom(h => h.User.City))
             .ForMember(dto => dto.JoinedAt, opt => opt.MapFrom(h => h.CreatedAt));
 
-        CreateMap<User, GetUserForAdminDto>();
+        CreateMap<User, GetUserForAdminDto>()
+            .ForMember(dto => dto.CreatedAt, opt => opt.MapFrom(u => u.Guest.CreatedAt));
     } 
 }
