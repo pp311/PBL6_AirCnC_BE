@@ -47,7 +47,9 @@ public class HostService : IHostService
         
         var result = _mapper.Map<GetHostDto>(host);
         result.NumberOfReviews = await _hostReviewRepository.CountAsync(h => h.HostId == id);
-        result.Rating = await _hostReviewRepository.AverageAsync(new HostReviewSpecification(id), h => h.Rating); 
+        if (result.NumberOfReviews > 0)
+            result.Rating = await _hostReviewRepository
+                                .AverageAsync(new HostReviewSpecification(id), h => h.Rating); 
         return result;
     }
 
@@ -61,7 +63,9 @@ public class HostService : IHostService
         foreach (var host in result)
         {
             host.NumberOfReviews = await _hostReviewRepository.CountAsync(h => h.HostId == host.Id);
-            host.Rating = await _hostReviewRepository.AverageAsync(new HostReviewSpecification(host.Id), h => h.Rating);
+            if (host.NumberOfReviews > 0)
+                host.Rating = await _hostReviewRepository
+                                  .AverageAsync(new HostReviewSpecification(host.Id), h => h.Rating);
             host.NumberOfProperties = await _propertyRepository.CountAsync(p => p.HostId == host.Id);
             host.NumberOfBookings = await _bookingRepository.CountAsync(b => b.Property.HostId == host.Id);
             host.TotalIncome= await _bookingRepository.SumAsync(new GetBookingWithHostSpecification(host.Id), b => b.TotalPrice);

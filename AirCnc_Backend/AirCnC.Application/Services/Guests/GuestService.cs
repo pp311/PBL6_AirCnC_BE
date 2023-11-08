@@ -36,7 +36,9 @@ public class GuestService : IGuestService
         
         var result = _mapper.Map<GetGuestDto>(host);
         result.NumberOfReviews = await _guestReviewRepository.CountAsync(h => h.GuestId == id);
-        result.Rating = await _guestReviewRepository.AverageAsync(new GuestReviewSpecification(id), h => h.Rating);
+        if (result.NumberOfReviews > 0)
+            result.Rating = await _guestReviewRepository
+                                .AverageAsync(new GuestReviewSpecification(id), h => h.Rating);
         return result;
     }
 }
