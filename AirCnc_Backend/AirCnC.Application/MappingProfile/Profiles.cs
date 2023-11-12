@@ -41,6 +41,7 @@ public class Profiles : Profile
             .ForMember(dto => dto.CleaningFee, opt => opt.MapFrom(b => b.Property.CleaningFee));    
         
         CreateMap<Booking, GetBookingForGuestDto>()
+            .ForMember(dto => dto.HostId, opt => opt.MapFrom(b => b.Property.HostId))
             .ForMember(dto => dto.HostName, opt => opt.MapFrom(b => b.Property.Host.User.FullName))
             .ForMember(dto => dto.HostEmail, opt => opt.MapFrom(b => b.Property.Host.User.Email))
             .ForMember(dto => dto.HostPhoneNumber, opt => opt.MapFrom(b => b.Property.Host.User.PhoneNumber))
