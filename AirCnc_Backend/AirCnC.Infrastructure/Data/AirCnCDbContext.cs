@@ -46,19 +46,19 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         modelBuilder.AddIdentitySeedData();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AirCnCDbContext).Assembly);
-        
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (!typeof(EntityBase).IsAssignableFrom(entityType.ClrType)) continue;
             var parameter = Expression.Parameter(entityType.ClrType, "p");
             var deletedCheck =
                 Expression.Lambda(
-                    Expression.Equal(Expression.Property(parameter, nameof(EntityBase.IsDeleted)), 
+                    Expression.Equal(Expression.Property(parameter, nameof(EntityBase.IsDeleted)),
                         Expression.Constant(false)),
                     parameter);
             modelBuilder.Entity(entityType.ClrType).HasQueryFilter(deletedCheck);
         }
-        
+
         base.OnModelCreating(modelBuilder);
     }
 
