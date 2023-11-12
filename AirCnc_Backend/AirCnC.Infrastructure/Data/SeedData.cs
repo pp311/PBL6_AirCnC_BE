@@ -121,7 +121,7 @@ public static class SeedData
                 Booking = booking,
                 Id = index,
                 Amount = booking.TotalPrice,
-                PaymentCode = new Guid().ToString(),
+                PaymentCode = Guid.NewGuid().ToString(),
                 Status = (booking.Status == BookingStatus.Completed ||
                           booking.Status == BookingStatus.CheckedIn ||
                           booking.Status == BookingStatus.Confirmed)
