@@ -34,6 +34,11 @@ public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity : Enti
     public void Update(TEntity entity) => DbSet.Update(entity);
 
     public void Delete(TEntity entity) => entity.IsDeleted = true;
+    public void RemoveRange(IEnumerable<TEntity> entities)
+    {
+        foreach (var entity in entities)
+            entity.IsDeleted = true;
+    }
 
     public async Task<TEntity?> FindOneAsync(ISpecification<TEntity> spec) 
         => await GetQuery<TEntity>.From(DbSet, spec).FirstOrDefaultAsync();

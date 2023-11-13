@@ -1,6 +1,7 @@
 ﻿using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Commons.Specifications;
+using AirCnC.Application.Services.Bookings.Specifications;
 using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Application.Services.Properties.Specifications;
 using AirCnC.Domain.Data;
@@ -21,6 +22,7 @@ public interface IPropertyService
     Task<GetPropertyDto> UpdateAsync(int id, UpsertPropertyDto upsertPropertyDto);
     Task ConfirmCreatePropertyRequest(int propertyId);
     Task RejectCreatePropertyRequest(int propertyId, RejectPropertyRequestDto dto);
+    Task<bool> IsStayedAsync(int propertyId);
 }
 
 public class PropertyService : IPropertyService
@@ -29,6 +31,7 @@ public class PropertyService : IPropertyService
     private readonly IRepository<Host> _hostRepository;
     private readonly IRepository<Guest> _guestRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository<Booking> _bookingRepository;
     private readonly IMapper _mapper;
     private readonly ICurrentUser _currentUser;
 
@@ -36,7 +39,8 @@ public class PropertyService : IPropertyService
                            IUnitOfWork unitOfWork, IMapper mapper,
                            ICurrentUser currentUser,
                            IRepository<Host> hostRepository,
-                           IRepository<Guest> guestRepository)
+                           IRepository<Guest> guestRepository,
+                           IRepository<Booking> bookingRepository)
     {
         _propertyRepository = propertyRepository;
         _unitOfWork = unitOfWork;
@@ -44,6 +48,7 @@ public class PropertyService : IPropertyService
         _currentUser = currentUser;
         _hostRepository = hostRepository;
         _guestRepository = guestRepository;
+        _bookingRepository = bookingRepository;
     }
 
     public async Task<PagedList<GetPropertyDto>> GetListByHostIdAsync(int hostId, PropertyQueryParameters pqp)
@@ -178,6 +183,18 @@ public class PropertyService : IPropertyService
         property.Status = PropertyStatus.Rejected;
         property.RejectionReason = dto.Reason;
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsStayedAsync(int propertyId)
+    {
+        var currentUserId = int.TryParse(_currentUser.Id, out var id) ? id : 0;
+        if (currentUserId == 0) return false;
+        
+        var guest = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(currentUserId));
+        if (guest is null) return false;
+
+        var spec = new IsGuestStayedSpecification(propertyId, guest.Id);
+        return await _bookingRepository.AnyAsync(spec);
     }
 }
 

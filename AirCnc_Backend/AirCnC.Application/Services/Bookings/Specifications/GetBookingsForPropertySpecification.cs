@@ -10,6 +10,6 @@ public class GetBookingsForPropertySpecification : Specification<Booking>
         AddFilter(p => p.PropertyId == propertyId);
 
         // Lay nhung booking dang active trong khoang tu fromDate den toDate
-        AddFilter(p => (p.CheckOutDate.Date >= fromDate.Date && p.CheckInDate.Date <= toDate.Date));
+        AddFilter(p => p.CheckOutDate.Date >= fromDate.Date && p.CheckInDate.Date <= toDate.Date);
     } 
 }

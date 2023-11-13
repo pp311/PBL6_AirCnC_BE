@@ -56,7 +56,7 @@ public class TokenService : ITokenService
             issuer: _jwtSettings.ValidIssuer,
             audience: _jwtSettings.ValidAudience,
             claims: await GetUserClaimListAsync(userId),
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryInMinutes),
+            expires: DateTime.Now.AddMinutes(_jwtSettings.AccessTokenExpiryInMinutes),
             signingCredentials: signingCredentials);
 
         return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
@@ -64,7 +64,7 @@ public class TokenService : ITokenService
 
     public async Task AddRefreshTokenAsync(int userId, string refreshToken)
     {
-        var refreshTokenLifetime = DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryInMinutes);
+        var refreshTokenLifetime = DateTime.Now.AddMinutes(_jwtSettings.RefreshTokenExpiryInMinutes);
         
         var refreshTokenEntity = new RefreshToken
         {

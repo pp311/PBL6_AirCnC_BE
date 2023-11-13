@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
 	}
         
 	[HttpPost("admin/log-in")]
-	public async Task<IActionResult> Login([FromBody] LoginDto logInDto)
+	public async Task<IActionResult> AdminLogin([FromBody] LoginDto logInDto)
 	{
 		var result = await _authenticateService.LoginAsync(logInDto, AppRole.Admin);
 		return Ok(result);
@@ -40,6 +40,19 @@ public class AuthController : ControllerBase
 		return Ok(result);
 	}
         
+	[HttpPost("log-in")]
+	public async Task<IActionResult> Login([FromBody] LoginDto logInDto)
+	{
+		var role = logInDto.Role?.ToLower() switch
+		{
+			"admin" => AppRole.Admin,
+			"user" => AppRole.User,
+			_ => throw new ArgumentException("Invalid role")
+		};
+		var result = await _authenticateService.LoginAsync(logInDto, role);
+		return Ok(result);
+	}
+	
 	/// <summary>
 	/// Dùng để refresh token, khi token hết hạn thì dùng refresh token để lấy access token và refresh token mới
 	/// </summary>

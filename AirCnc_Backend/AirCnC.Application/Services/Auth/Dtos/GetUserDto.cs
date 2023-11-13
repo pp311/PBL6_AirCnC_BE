@@ -7,4 +7,5 @@ public class GetUserDto
     public string Email { get; set; } = null!;
     public string FullName { get; set; } = null!;
     public string? AvatarUrl { get; set; }
+    public bool IsHost { get; set; }
 }

@@ -58,23 +58,101 @@ public class CancellationService : ICancellationService
         cancellationTicket.Status = CancellationTicketStatus.Pending;
         cancellationTicket.IsIssuerGuest = dto.IsGuest;
         cancellationTicket.TheOtherPartyId = dto.IsGuest ? booking.Property.HostId : booking.GuestId;
-        var today = DateTime.UtcNow.Date;
+        var today = DateTime.Now;
         
-        if (booking.CheckInDate.Date >= today && booking.Status is BookingStatus.CheckedIn)
+        if (booking.CheckInDate.Date >= today || booking.Status is BookingStatus.CheckedIn)
             cancellationTicket.Type = CancellationTicketType.CancelledAfterCheckIn;
-        else if (booking.CheckInDate.Date >= today && booking.CheckInDate.Date >= today.AddDays(-2))
-            cancellationTicket.Type = CancellationTicketType.CancelledAfterCheckIn;
+        else if (booking.CheckInDate.Date <= today.Date && booking.CheckInDate.Date >= today.AddDays(-1))
+            cancellationTicket.Type = CancellationTicketType.CancelledBeforeCheckIn;
+        else if (booking.CheckInDate.Date <= today.Date.AddDays(-1) && booking.CheckInDate.Date >= today.AddDays(-3))
+            cancellationTicket.Type = CancellationTicketType.CancelledBefore1Days;
         else
-            cancellationTicket.Type = CancellationTicketType.CancelledBefore2Days;
+            cancellationTicket.Type = CancellationTicketType.CancelledBefore3Days;
+
+        booking.Status = booking.Status == BookingStatus.CheckedIn 
+                             ? BookingStatus.CancelledAfterCheckIn 
+                             : BookingStatus.CancelledBeforeCheckIn;
         
         // Todo: Calculate refund amount and charge amount
+        if (cancellationTicket.IsIssuerGuest)
+        {
+            if (booking.CancellationPolicyType == CancellationPolicyType.Flexible)
+            {
+                if (cancellationTicket.Type == CancellationTicketType.CancelledAfterCheckIn)
+                {
+                    // Neu cancel sau checkin: tinh tien = so dem da o + 1 va co clean fee
+                    var stayedFee = booking.PricePerNight * ((DateTime.Now.Date - booking.CheckInDate.Date).Days + 1);
+                    cancellationTicket.RefundAmount = booking.TotalPrice - (stayedFee + booking.CleaningFee);
+                }
+                else if (cancellationTicket.Type == CancellationTicketType.CancelledBeforeCheckIn)
+                {
+                    // Neu cancel trong vong 24h truoc check-in: tinh tien = 1 dem
+                    cancellationTicket.RefundAmount = booking.TotalPrice - booking.PricePerNight;
+                }
+                else
+                    cancellationTicket.RefundAmount = booking.TotalPrice;
+            }
+            else
+            {
+                if (cancellationTicket.Type == CancellationTicketType.CancelledAfterCheckIn)
+                {
+                    // Neu cancel sau checkin: tinh tien = so dem da o + 1 va 50% cac dem chua o va co clean fee
+                    var stayedDays = (DateTime.Now.Date - booking.CheckInDate.Date).Days;
+                    var bookingDays = (booking.CheckOutDate.Date - booking.CheckInDate.Date).Days;
+                    var stayedFee = booking.PricePerNight * (stayedDays + 1);
+                    var notStayedFee = booking.PricePerNight * (bookingDays - stayedDays) * 0.5;
+                    cancellationTicket.RefundAmount = booking.TotalPrice - (stayedFee + notStayedFee + booking.CleaningFee);
+                }
+                else if (cancellationTicket.Type == CancellationTicketType.CancelledBeforeCheckIn 
+                         || cancellationTicket.Type == CancellationTicketType.CancelledBefore1Days)
+                {
+                    // Neu cancel trong vong 24h truoc check-in: tinh tien = 1 dem
+                    var bookingDays = (booking.CheckOutDate.Date - booking.CheckInDate.Date).Days;
+                    var notStayedFee = booking.PricePerNight * bookingDays * 0.5;
+                    cancellationTicket.RefundAmount = booking.TotalPrice - notStayedFee;
+                }
+                else
+                    cancellationTicket.RefundAmount = booking.TotalPrice;
+            }
+        }
+        else
+        {
+            cancellationTicket.RefundAmount = booking.TotalPrice;
+            if (cancellationTicket.Type == CancellationTicketType.CancelledAfterCheckIn)
+            {
+                // Neu cancel sau checkin: phat tien = 50% cac dem chua o
+                var stayedDays = (DateTime.Now.Date - booking.CheckInDate.Date).Days;
+                var bookingDays = (booking.CheckOutDate.Date - booking.CheckInDate.Date).Days;
+                var notStayedFee = booking.PricePerNight * (bookingDays - stayedDays) * 0.5;
+                cancellationTicket.ChargeAmount = notStayedFee;
+            }
+            else if (cancellationTicket.Type == CancellationTicketType.CancelledBeforeCheckIn) 
+            {
+                // Neu cancel trong vong 24h truoc check-in: 50%  cac dem chua o
+                var bookingDays = (booking.CheckOutDate.Date - booking.CheckInDate.Date).Days;
+                var notStayedFee = booking.PricePerNight * bookingDays * 0.5;
+                cancellationTicket.ChargeAmount = notStayedFee;
+            }
+            else if (cancellationTicket.Type == CancellationTicketType.CancelledBefore1Days)
+            {
+                // Trong vong 3 ngay: 25%
+                var bookingDays = (booking.CheckOutDate.Date - booking.CheckInDate.Date).Days;
+                var notStayedFee = booking.PricePerNight * bookingDays * 0.25;
+                cancellationTicket.ChargeAmount = notStayedFee;
+            }
+            else
+            {
+                // Truoc 3 ngay: 0%
+                cancellationTicket.ChargeAmount = 0;
+            }
+        }
         
         _cancellationTicketsRepository.Add(cancellationTicket);
         await _unitOfWork.SaveChangesAsync(); 
         
         return _mapper.Map<GetCancellationDto>(cancellationTicket);
     }
-
+    
     public async Task<PagedList<GetCancellationDto>> GetCancellationTicketsAsync(CancellationTicketQueryParameters ctp)
     {
         var (cancellationTickets, totalCount) = await _cancellationTicketsRepository
@@ -106,7 +184,12 @@ public class CancellationService : ICancellationService
         
         booking.Status = cancellationTicket.CreatedAt < booking.CheckInDate 
                              ? BookingStatus.CancelledBeforeCheckIn 
-                             : BookingStatus.CancelledAfterCheckIn; 
+                             : BookingStatus.CancelledAfterCheckIn;
+
+        cancellationTicket.RefundAmount = dto.RefundAmount;
+        cancellationTicket.ChargeAmount = dto.ChargeAmount;
+        
+        //Todo: create refund payment & charge payment
         
         await _unitOfWork.SaveChangesAsync();
     }
@@ -154,6 +237,9 @@ public class CancellationService : ICancellationService
             if (booking.GuestId != host.Id)
                 throw new BookingCancellationException("You can only cancel your own bookings.");
         }
+        
+        if ((booking.CheckOutDate.Date - DateTime.Now.Date).Days == 0)
+            throw new BookingCancellationException("You can only cancel bookings at least 1 day before check-out date");      
 
         return booking;
     }

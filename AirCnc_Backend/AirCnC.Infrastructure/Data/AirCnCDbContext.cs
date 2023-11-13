@@ -76,19 +76,19 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
             {
                 case EntityState.Added:
                     entry.Entity.CreatedBy = int.TryParse(_currentUser.Id, out var id) ? id : 0;
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
-                    entry.Entity.LastModifiedAt = DateTime.UtcNow;
+                    entry.Entity.CreatedAt = DateTime.Now;
+                    entry.Entity.LastModifiedAt = DateTime.Now;
                     entry.Entity.IsDeleted = false;
                     break;
 
                 case EntityState.Modified:
                     entry.Entity.LastModifiedBy = int.TryParse(_currentUser.Id, out var id2) ? id2 : 0;
-                    entry.Entity.LastModifiedAt = DateTime.UtcNow;
+                    entry.Entity.LastModifiedAt = DateTime.Now;
                     break;
 
                 case EntityState.Deleted:
                     entry.State = EntityState.Modified;
-                    entry.Entity.LastModifiedAt = DateTime.UtcNow;
+                    entry.Entity.LastModifiedAt = DateTime.Now;
                     entry.Entity.IsDeleted = true;
                     break;
             }

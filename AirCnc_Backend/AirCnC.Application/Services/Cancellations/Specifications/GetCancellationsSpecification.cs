@@ -18,6 +18,9 @@ public class GetCancellationsSpecification : Specification<CancellationTicket>
         
         if (parameters.IsGuest.HasValue)
             AddFilter(x => x.IsIssuerGuest == parameters.IsGuest.Value);
+        
+        if (parameters.IssuerId.HasValue)
+            AddFilter(x => x.CreatedBy == parameters.IssuerId.Value);
 
         if (parameters.HostId.HasValue)
         {

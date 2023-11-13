@@ -18,4 +18,5 @@ public class CancellationTicketQueryParameters : PagingParameters
     
     public bool? IsGuest { get; set; }
     public int? HostId { get; set; }
+    public int? IssuerId { get; set; }
 }
