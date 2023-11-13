@@ -11,6 +11,7 @@ namespace AirCnC.Domain.Data
         void Add(T entity);
         void Update(T entity);
         void Delete(T entity);
+        void RemoveRange(IEnumerable<T> entities);
         
         Task<T?> FindOneAsync(ISpecification<T> spec);
         Task<IEnumerable<T>> FindListAsync(ISpecification<T> spec);

@@ -1,3 +1,4 @@
+using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Auth.Dtos;
 using AirCnC.Domain.Constants;
 using AirCnC.Domain.Data;
@@ -28,18 +29,21 @@ public class AuthService : IAuthService
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IRepository<Guest> _guestRepository;
+    private readonly IRepository<Host> _hostRepository;
 
     public AuthService(ITokenService tokenService,
                        UserManager<User> userManager,
                        IMapper mapper,
                        IUnitOfWork unitOfWork,
-                       IRepository<Guest> guestRepository)
+                       IRepository<Guest> guestRepository,
+                       IRepository<Host> hostRepository)
     {
         _tokenService = tokenService;
         _userManager = userManager;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
         _guestRepository = guestRepository;
+        _hostRepository = hostRepository;
     }
     public async Task<GetUserDto> SignUpAsync(SignUpDto signUpDto)
     {
@@ -151,7 +155,8 @@ public class AuthService : IAuthService
             throw new InvalidPasswordException();
 
         var userDto = _mapper.Map<GetUserDto>(user);
-
+        userDto.IsHost = await _hostRepository.AnyAsync(new HostByUserIdSpecification(user.Id));
+        
         var tokenDto = new TokenDto
         {
             AccessToken = await _tokenService.GenerateAccessTokenAsync(user.Id),

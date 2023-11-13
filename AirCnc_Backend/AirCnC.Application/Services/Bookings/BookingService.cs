@@ -104,7 +104,7 @@ public class BookingService : IBookingService
 
     public async Task<List<GetBookingForPropertyDto>> GetBookingsForPropertyAsync(int propertyId, DateTime fromDate, DateTime toDate)
     {
-        var spec = new GetBookingsForPropertySpecification(propertyId, fromDate, toDate);
+        var spec = new ActiveBookingBetweenDatesSpecification(propertyId, fromDate, toDate);
         var bookings = await _bookingRepository.FindListAsync(spec);
 
         var bookingsDto = _mapper.Map<List<GetBookingForPropertyDto>>(bookings);
@@ -132,11 +132,11 @@ public class BookingService : IBookingService
             throw new InvalidBookingDateException("Checkin date must be before checkout date");
 
         // Check if checkin date is after today
-        if (createBookingDto.CheckInDate.Date <= DateTime.UtcNow.Date)
+        if (createBookingDto.CheckInDate.Date <= DateTime.Now.Date)
             throw new InvalidBookingDateException("Checkin date must be after today");
 
         // Check if checkin date is after today + max days in advance
-        if (createBookingDto.CheckInDate.Date > DateTime.UtcNow.AddDays(_airCnCSettings.MaxDaysInAdvance).Date)
+        if (createBookingDto.CheckInDate.Date > DateTime.Now.AddDays(_airCnCSettings.MaxDaysInAdvance).Date)
             throw new InvalidBookingDateException($"Checkin date must be before today + {_airCnCSettings.MaxDaysInAdvance} days");
 
         // Check if stay duration is valid

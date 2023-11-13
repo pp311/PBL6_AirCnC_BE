@@ -59,7 +59,7 @@ public class PaymentService : IPaymentService
         vnpHistoryDto.vnp_BankCode = createBookingPaymentDto.BankCode!;
         vnpHistoryDto.vnp_TmnCode = _paymentConfig.VnpTmnCode;
         //vnpHistoryDTO.BookingPaymentId= createBookingPaymentDto.BookingId;
-        vnpHistoryDto.vnp_CreateDate = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        vnpHistoryDto.vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
 
         //Build URL for VNPAY
         VnPayLibrary vnpay = new VnPayLibrary();

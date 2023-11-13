@@ -63,6 +63,13 @@ namespace AirCnC.API.Controllers
             return Ok(result);
         }
         
+        [HttpGet("{propertyId:int}/is-stayed")]
+        public async Task<IActionResult> IsStayed(int propertyId)
+        {
+            var result = await _propertyService.IsStayedAsync(propertyId);
+            return Ok(result);
+        }
+        
         [HttpPost("{propertyId:int}/confirm")]
         public async Task<IActionResult> ConfirmCreatePropertyRequest(int propertyId)
         {

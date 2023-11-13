@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using AirCnC.API.Common.Identity;
+using AirCnC.Application.BackgroundServices;
 using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Services.Auth;
@@ -225,13 +226,13 @@ public static class ServiceExtensions
     {
         services.AddQuartz(options =>
         {
-            
-            // options.AddJob<TestJob>(jobKey)
-            //        .AddTrigger(trigger =>
-            //             trigger.ForJob(jobKey)
-            //                 .WithSimpleSchedule(schedule =>
-            //                     schedule.WithIntervalInSeconds(5)
-            //                             .RepeatForever()));
+            var jobKey = new JobKey("RemovePendingBookingJob");
+            options.AddJob<RemovePendingBookingJob>(jobKey)
+                   .AddTrigger(trigger =>
+                        trigger.ForJob(jobKey)
+                            .WithSimpleSchedule(schedule =>
+                                schedule.WithIntervalInMinutes(3)
+                                        .RepeatForever()));
         });
 
         services.AddQuartzHostedService(options =>
