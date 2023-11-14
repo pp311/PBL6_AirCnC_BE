@@ -27,4 +27,11 @@ public class HostController : ControllerBase
         var hosts = await _hostService.GetHostsAsync(pp);
         return Ok(hosts);
     }
+
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetHostByUserIdAsync(int userId)
+    {
+        var host = await _hostService.GetHostByUserIdAsync(userId);
+        return Ok(host);
+    }
 }
