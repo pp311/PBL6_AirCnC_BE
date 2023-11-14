@@ -10,7 +10,7 @@ namespace AirCnC.Application.Services.CheckIn;
     
 public interface ICheckInService
 {
-    Task CheckInAsync(Guid code);
+    Task CheckInAsync(Guid guid);
 }    
 
 public class CheckInService : ICheckInService
@@ -28,10 +28,10 @@ public class CheckInService : ICheckInService
 
     }
 
-    public async Task CheckInAsync(Guid code)
+    public async Task CheckInAsync(Guid guid)
     {
-        var booking = await _bookingRepository.FindOneAsync(new BookingByGuidSpecification(code.ToString()))
-                      ?? throw new InvalidCheckInCodeException(code);
+        var booking = await _bookingRepository.FindOneAsync(new BookingByGuidSpecification(guid.ToString()))
+                      ?? throw new InvalidCheckInCodeException(guid);
         ValidateBooking(booking);
         booking.Status = BookingStatus.CheckedIn;
         await _unitOfWork.SaveChangesAsync();
