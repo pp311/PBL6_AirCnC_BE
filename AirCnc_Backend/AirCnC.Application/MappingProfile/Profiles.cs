@@ -7,6 +7,7 @@ using AirCnC.Application.Services.Wishlists.Dtos;
 using AirCnC.Domain.Entities;
 using AutoMapper;
 using  AirCnC.Application.Services.Auth.Dtos;
+using AirCnC.Application.Services.HostPayments.Dtos;
 
 namespace AirCnC.Application.MappingProfile;
 
@@ -72,5 +73,8 @@ public class Profiles : Profile
             .ForMember(dto => dto.CreatedAt, opt => opt.MapFrom(u => u.Guest.CreatedAt));
 
         CreateMap<UpdateUserInfoDto, User>();
+
+        CreateMap<HostPayment, HostPaymentDto>();
+        CreateMap<PaymentInfo, HostPaymentInfoDto>();
     } 
 }
