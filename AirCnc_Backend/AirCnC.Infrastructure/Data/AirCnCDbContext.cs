@@ -41,6 +41,7 @@ public class AirCnCDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     public DbSet<HostPayment> HostPayments { get; set; } = null!;
     // ReSharper disable once InconsistentNaming
     public DbSet<VnpHistory> VNPHistories { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using AirCnC.API.Chat;
 using AirCnC.API.Extensions;
 using AirCnC.API.Middlewares;
 using AirCnC.Application.Commons;
@@ -25,7 +26,8 @@ builder.Services.AddDbContext(builder.Configuration)
     .AddEmailSender()
     .AddCloudinary(builder.Configuration)
     .AddQuartz()
-    .AddLogging(builder.Configuration);
+    .AddLogging(builder.Configuration)
+    .AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(IApplicationAssemblyMarker));
 
@@ -45,6 +47,6 @@ app.UseCors("AirCnC");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<ChatHub>("/chathub");
 app.MapControllers();
-
 app.Run();
