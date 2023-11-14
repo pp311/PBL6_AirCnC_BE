@@ -42,11 +42,11 @@ public static class SeedData
         var guests = GetGuests(users);
         var hosts = GetHosts(users);
         var properties = GetProperties(hosts);
-        var paymentInfos = GetPaymentInfo(hosts);
+        var paymentInfos = GetPaymentInfo(hosts, users);
         if (GetPropertyImages(properties, out var propertyImages)) return;
         var bookings = GetBookings(properties, guests);
         var bookingPayments = GetBookingPayments(bookings);
-        var hostPayments = GetHostPayments(bookings);
+        var hostPayments = GetHostPayments(bookings, paymentInfos);
         var propertyUtilities = GetPropertyUtility();
         var guestReviews = GetGuestReviews(guests, hosts);
         var hostReviews = GetHostReviews(hosts, guests);
@@ -75,7 +75,6 @@ public static class SeedData
             bookingPayments.Add(new BookingPayment()
             {
                 BookingId = booking.Id,
-                Booking = booking,
                 Id = index,
                 Amount = booking.TotalPrice,
                 PaymentCode = Guid.NewGuid().ToString(),
@@ -93,7 +92,7 @@ public static class SeedData
         return bookingPayments;
     }
 
-    private static List<HostPayment> GetHostPayments(List<Booking> bookings)
+    private static List<HostPayment> GetHostPayments(List<Booking> bookings, List<PaymentInfo> paymentInfos)
     {
         var hostPayments = new List<HostPayment>();
         var index = 1;
@@ -102,7 +101,6 @@ public static class SeedData
             hostPayments.Add(new HostPayment()
             {
                 BookingId = booking.Id,
-                Booking = booking,
                 Id = index,
                 Amount = booking.TotalPrice,
                 Status = (booking.Status == BookingStatus.Completed ||
@@ -111,32 +109,28 @@ public static class SeedData
                           booking.CheckOutDate < DateTime.Today.AddMonths(-3))
                     ? HostPaymentStatus.Paid : HostPaymentStatus.Pending,
                 CreatedAt = new Faker().Date.Soon(5, booking.CheckOutDate),
-                PaymentInfo = booking.Property.Host.PaymentInfo,
-                PaymentInfoId = booking.Property.Host.PaymentInfo.Id,
-
+                PaymentInfoId = new Faker().PickRandom(paymentInfos.Select(p => p.Id).ToList())
             });
             index++;
         }
         return hostPayments;
     }
 
-    private static List<PaymentInfo> GetPaymentInfo(List<Host> hosts)
+    private static List<PaymentInfo> GetPaymentInfo(List<Host> hosts, List<User> users)
     {
         var paymentInfos = new List<PaymentInfo>();
         int index = 1;
         foreach (var host in hosts)
         {
-            host.PaymentInfo = new PaymentInfo()
+            var paymentInfo = new PaymentInfo()
             {
-                AccountHolder = host.User.FullName,
+                AccountHolder = users.FirstOrDefault(u => u.Id == host.UserId)?.FullName ?? "Unknown",
                 AccountNumber = new Faker().Finance.Account(),
                 BankName = new Faker().Finance.AccountName(),
                 HostId = host.Id,
-                Host = host,
                 Id = index
-
             };
-            paymentInfos.Add(host.PaymentInfo);
+            paymentInfos.Add(paymentInfo);
 
             index++;
         }
@@ -196,7 +190,7 @@ public static class SeedData
         var bookings = new Faker<Booking>()
             .RuleFor(p => p.PricePerNight, f => f.Random.Int(100, 50000) * 1000)
             .RuleFor(p => p.CleaningFee, f => f.Random.Int(30, 350) * 1000)
-            .RuleFor(b => b.Property, f => f.PickRandom(properties))
+            .RuleFor(b => b.PropertyId, f => f.PickRandom(properties.Select(p => p.Id).ToList()))
             .RuleFor(b => b.SystemFee, _ => 10)
             .RuleFor(b => b.CheckInDate,
                 f => f.Date.Between(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow.AddYears(1)).Date)
@@ -214,14 +208,9 @@ public static class SeedData
                                      b) => b.CheckOutDate < DateTime.UtcNow
                                                ? BookingStatus.Completed
                                                : f.PickRandom<BookingStatus>())
-            .RuleFor(b => b.Guest, f => f.PickRandom(guests))
+            .RuleFor(b => b.GuestId, f => f.PickRandom(guests.Select(g => g.Id).ToList()))
             .RuleFor(b => b.Guid, _ => Guid.NewGuid().ToString())
             .Generate(500);
-        foreach (var booking in bookings)
-        {
-            booking.GuestId = booking.Guest.Id;
-            booking.PropertyId = booking.Property.Id;
-        }
         return bookings;
     }
 
@@ -268,16 +257,15 @@ public static class SeedData
         {
             Id = u.Id,
             UserId = u.Id,
-            User = u,
             CreatedAt = new Faker().Date.Past(),
         }).ToList();
     }
 
     private static List<Host> GetHosts(List<User> users)
     {
-        var hostUsers = users.ToList();
+        var hostUsers = users.Select(h => h.Id).ToList();
         var hosts = new Faker<Host>()
-            .RuleFor(h => h.User, f =>
+            .RuleFor(h => h.UserId, f =>
             {
                 var user = f.PickRandom(hostUsers);
                 hostUsers.Remove(user);
@@ -286,10 +274,6 @@ public static class SeedData
             .RuleFor(h => h.Id, f => f.IndexFaker + 1)
             .RuleFor(h => h.CreatedAt, f => f.Date.Past())
             .Generate(20);
-        foreach (var host in hosts)
-        {
-            host.UserId = host.User.Id;
-        }
         return hosts;
     }
 
@@ -297,7 +281,7 @@ public static class SeedData
     {
         var props = new Faker<Property>()
             .RuleFor(p => p.Id, f => f.IndexFaker + 1)
-            .RuleFor(p => p.Host, f => f.PickRandom(hosts))
+            .RuleFor(p => p.HostId, f => f.PickRandom(hosts.Select(x => x.Id).ToList()))
             .RuleFor(p => p.Type, f => f.PickRandom<PropertyType>())
             .RuleFor(p => p.BedCount, f => f.Random.Number(1, 5))
             .RuleFor(p => p.BedroomCount, f => f.Random.Number(1, 8))
@@ -317,10 +301,6 @@ public static class SeedData
             .RuleFor(p => p.CleaningFee, f => f.Random.Int(30, 350) * 1000)
             .RuleFor(p => p.Status, f => f.PickRandom<PropertyStatus>())
             .Generate(100);
-        foreach (var property in props)
-        {
-            property.HostId = property.Host.Id;
-        }
         return props;
     }
 

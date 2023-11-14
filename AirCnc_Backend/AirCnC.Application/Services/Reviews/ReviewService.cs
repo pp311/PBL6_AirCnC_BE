@@ -267,18 +267,21 @@ public class ReviewMapping : Profile
     {
         CreateMap<HostReview, GetReviewDto>()
             .ForMember(dto => dto.ReviewerId, opt => opt.MapFrom(hr => hr.GuestId))
+            .ForMember(dto => dto.UserId, opt => opt.MapFrom(hr => hr.Guest.UserId))
             .ForMember(dto => dto.ReviewerName, opt => opt.MapFrom(hr => hr.Guest.User.FullName))
             .ForMember(dto => dto.ReviewerAvatarUrl, opt => opt.MapFrom(hr => hr.Guest.User.AvatarUrl))
             .ForMember(dto => dto.ReviewTime, opt => opt.MapFrom(hr => hr.LastModifiedAt));
 
         CreateMap<GuestReview, GetReviewDto>()
             .ForMember(dto => dto.ReviewerId, opt => opt.MapFrom(hr => hr.HostId))
+            .ForMember(dto => dto.UserId, opt => opt.MapFrom(hr => hr.Host.UserId))
             .ForMember(dto => dto.ReviewerName, opt => opt.MapFrom(hr => hr.Host.User.FullName))
             .ForMember(dto => dto.ReviewerAvatarUrl, opt => opt.MapFrom(hr => hr.Host.User.AvatarUrl))
             .ForMember(dto => dto.ReviewTime, opt => opt.MapFrom(hr => hr.LastModifiedAt));
         
         CreateMap<PropertyReview, GetPropertyReviewDto>()
             .ForMember(dto => dto.GuestName, opt => opt.MapFrom(hr => hr.Guest.User.FullName))
+            .ForMember(dto => dto.UserId, opt => opt.MapFrom(hr => hr.Guest.UserId))
             .ForMember(dto => dto.GuestAvatarUrl, opt => opt.MapFrom(hr => hr.Guest.User.AvatarUrl))
             .ForMember(dto => dto.ReviewTime, opt => opt.MapFrom(hr => hr.LastModifiedAt))
             .ForMember(dto => dto.AverageRating, opt => opt
