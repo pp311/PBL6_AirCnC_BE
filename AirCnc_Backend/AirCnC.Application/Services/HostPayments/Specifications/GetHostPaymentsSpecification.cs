@@ -8,15 +8,17 @@ public class GetHostPaymentsSpecification:Specification<HostPayment>
 {
     public GetHostPaymentsSpecification(HostPaymentQueryParameters hqp,int? hostId=null)
     {
-        AddInclude(hp=>hp.PaymentInfo.Host);
+        AddInclude(hp => hp.PaymentInfo.Host);
+        
         if(hqp.Status is not null)
             AddFilter(h => h.Status == hqp.Status);
+        
         if (hqp.IsDescending)
             ApplyDescending();
+        
         if (hostId is not null)
-        {
-            AddFilter(h=>h.PaymentInfo.HostId==hostId);
-        }
+            AddFilter(h => h.PaymentInfo.HostId == hostId);
+        
         ApplyPaging(hqp.PageIndex, hqp.PageSize);
     }
 }

@@ -15,10 +15,10 @@ public class HostController : ControllerBase
         _hostService = hostService;
     }
     
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetHostAsync(int id)
+    [HttpGet("{hostId:int}")]
+    public async Task<IActionResult> GetHostAsync(int hostId)
     {
-        var host = await _hostService.GetHostAsync(id);
+        var host = await _hostService.GetHostAsync(hostId);
         return Ok(host);
     }
     [HttpGet]
@@ -28,7 +28,7 @@ public class HostController : ControllerBase
         return Ok(hosts);
     }
 
-    [HttpGet("user/{userId}")]
+    [HttpGet("user/{userId:int}")]
     public async Task<IActionResult> GetHostByUserIdAsync(int userId)
     {
         var host = await _hostService.GetHostByUserIdAsync(userId);

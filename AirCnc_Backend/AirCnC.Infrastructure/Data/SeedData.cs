@@ -52,49 +52,6 @@ public static class SeedData
         var hostReviews = GetHostReviews(hosts, guests);
         var propertyReviews = GetPropertyReviews(properties, guests);
 
-        foreach (var host in hosts)
-        {
-            host.User = null;
-            host.PaymentInfo = null;
-        }
-
-        foreach (var guest in guests)
-        {
-            guest.User = null;
-        }
-        foreach (var paymentInfo in paymentInfos)
-        {
-            paymentInfo.Host = null;
-        }
-
-        foreach (var property in properties)
-        {
-            property.Host = null;
-        }
-
-        foreach (var booking in bookings)
-        {
-            booking.Guest = null;
-            booking.Property = null;
-        }
-
-        foreach (var paymentInfo in paymentInfos)
-        {
-            paymentInfo.Host = null;
-        }
-
-        foreach (var bookingPayment in bookingPayments)
-        {
-            bookingPayment.Booking = null;
-            bookingPayment.Guest = null;
-        }
-
-        foreach (var hostPayment in hostPayments)
-        {
-            hostPayment.Booking = null;
-            hostPayment.PaymentInfo = null;
-        }
-
         modelBuilder.Entity<Guest>().HasData(guests);
         modelBuilder.Entity<Host>().HasData(hosts);
         modelBuilder.Entity<PaymentInfo>().HasData(paymentInfos);

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AirCnC.Application.Commons;
+﻿using AirCnC.Application.Commons;
 using AirCnC.Application.Services.HostPayments.Dtos;
 using AirCnC.Application.Services.HostPayments.Specifications;
 using AirCnC.Domain.Data;
@@ -40,10 +35,7 @@ namespace AirCnC.Application.Services.HostPayments
             var spec = new GetHostPaymentsSpecification(hqp);
             var (hostPayments,totalCount) = await _hostPaymentRepository.FindWithTotalCountAsync(spec);
             var hostPaymentsDto = _mapper.Map<List<HostPaymentDto>>(hostPayments);
-            if (!hostPayments.Any())
-                throw new EntityNotFoundException(nameof(HostPayment),"" );
             return new PagedList<HostPaymentDto>(hostPaymentsDto, totalCount, hqp.PageIndex, hqp.PageSize);
-
         }
 
         public async Task<HostPaymentDto> GetPaymentAsync(int hostPaymentId)
@@ -68,8 +60,6 @@ namespace AirCnC.Application.Services.HostPayments
             var spec = new GetHostPaymentsSpecification(hqp, hostId);
             var (hostPayments, totalCount) = await _hostPaymentRepository.FindWithTotalCountAsync(spec);
             var hostPaymentsDto = _mapper.Map<List<HostPaymentDto>>(hostPayments);
-            if(!hostPayments.Any())
-                throw new EntityNotFoundException(nameof(Host), hostId.ToString());
             return new PagedList<HostPaymentDto>(hostPaymentsDto, totalCount, hqp.PageIndex, hqp.PageSize);
         }
     }

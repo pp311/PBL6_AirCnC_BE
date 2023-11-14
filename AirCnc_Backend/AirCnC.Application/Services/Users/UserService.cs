@@ -1,7 +1,5 @@
 ﻿using AirCnC.Application.Commons;
-using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Users.Dtos;
-using AirCnC.Application.Services.Users.Specifications;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Exceptions;
