@@ -5,6 +5,7 @@ public class GetPropertyReviewDto
     public int Id { get; set; }
     public int PropertyId { get; set; }
     public int GuestId { get; set; }
+    public int UserId { get; set; }
     public string GuestName { get; set; } = string.Empty;
     public string? GuestAvatarUrl { get; set; } = string.Empty;
     

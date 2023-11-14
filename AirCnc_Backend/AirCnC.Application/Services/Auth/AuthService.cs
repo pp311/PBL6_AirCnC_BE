@@ -120,11 +120,14 @@ public class AuthService : IAuthService
 
         var user = await GetOrCreateUserAsync(userInfo);
 
+        var userDto = _mapper.Map<GetUserDto>(user);
+        userDto.IsHost = await _hostRepository.AnyAsync(new HostByUserIdSpecification(user.Id));
+        
         var tokenDto = new TokenDto
         {
             AccessToken = await _tokenService.GenerateAccessTokenAsync(user.Id),
             RefreshToken = _tokenService.GenerateRefreshToken(),
-            User = _mapper.Map<GetUserDto>(user)
+            User = userDto
         };
 
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
