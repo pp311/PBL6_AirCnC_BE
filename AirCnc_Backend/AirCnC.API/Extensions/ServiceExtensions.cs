@@ -10,6 +10,7 @@ using AirCnC.Application.Services.Cancellations;
 using AirCnC.Application.Services.CheckIn;
 using AirCnC.Application.Services.Email;
 using AirCnC.Application.Services.Guests;
+using AirCnC.Application.Services.HostPayments;
 using AirCnC.Application.Services.Hosts;
 using AirCnC.Application.Services.ImageUploader;
 using AirCnC.Application.Services.Payments;
@@ -61,6 +62,7 @@ public static class ServiceExtensions
         services.AddScoped<ICheckInService,CheckInService>();
         services.AddScoped<IUserService,UserService>();
         services.AddScoped<ICancellationService, CancellationService>();
+        services.AddScoped<IHostPaymentService,HostPaymentService>();
 
         return services;
     }
