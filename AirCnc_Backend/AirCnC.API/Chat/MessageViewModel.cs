@@ -4,11 +4,9 @@ namespace AirCnC.API.Chat;
 
 public class MessageViewModel
  {
-     public int Id { get; set; }
-     [Required]
+     public int FromUserId { get; set; }
+     public string FromUserName { get; set; } = null!;
+     public string? FromUserAvatar { get; set; } 
+     public int ToUserId { get; set; }
      public string Content { get; set; } = null!;
-     public string? FromUserName { get; set; }
-     [Required]
-     public string Room { get; set; } = null!;
-     public string? Avatar { get; set; } 
  }
