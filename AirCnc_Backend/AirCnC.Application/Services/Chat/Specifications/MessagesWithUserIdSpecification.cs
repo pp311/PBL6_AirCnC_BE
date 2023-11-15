@@ -9,7 +9,8 @@ public class MessagesWithUserIdSpecification : Specification<Message>
     {
         AddFilter(m => m.SenderId == userId1 && m.ReceiverId == userId2 
                        || m.SenderId == userId2 && m.ReceiverId == userId1);
-        
+
+        AddOrderByField(nameof(Message.CreatedAt));
         if (isDescending)
             ApplyDescending();
     } 
