@@ -40,8 +40,10 @@ public class ChatHub : Hub
         var messageViewModel = new MessageViewModel
         {
             Content = Regex.Replace(message, @"<.*?>", string.Empty),
-            FromUserName = Context.User?.Identity?.Name,
-            Avatar = Context.User!.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value,
+            FromUserId = int.Parse(senderId!),
+            FromUserName = Context.User?.Identity?.Name ?? string.Empty,
+            FromUserAvatar = Context.User!.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value,
+            ToUserId = int.Parse(user)
         };
         await Clients.User(user).SendAsync("ReceiveMessage", messageViewModel);
         await Clients.Caller.SendAsync("ReceiveMessage", messageViewModel);

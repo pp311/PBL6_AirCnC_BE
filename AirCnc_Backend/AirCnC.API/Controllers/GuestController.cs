@@ -20,4 +20,14 @@ public class GuestController : ControllerBase
         var result = await _guestService.GetGuestAsync(guestId);
         return Ok(result);
     }
+    
+    /// <summary>
+    /// Check xem guest đã từng ở tại property của host hay chưa (nếu mình không phải host hoặc chưa login thì luôn false)
+    /// </summary>
+    [HttpGet("{guestId:int}/is-stayed")]
+    public async Task<IActionResult> CheckGuestIsStayed(int guestId)
+    {
+        var result = await _guestService.CheckGuestIsStayedAsync(guestId);
+        return Ok(result);
+    }
 } 
