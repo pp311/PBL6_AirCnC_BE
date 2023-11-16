@@ -9,5 +9,5 @@ public class Message
     {
         To.AddRange(to);
         Subject = subject;
-        Content = content;        
+        Content = content;
     }}

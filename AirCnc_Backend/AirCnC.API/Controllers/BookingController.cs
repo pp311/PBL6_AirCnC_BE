@@ -1,5 +1,6 @@
 using AirCnC.Application.Services.Bookings;
 using AirCnC.Application.Services.Bookings.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers;
@@ -59,6 +60,7 @@ public class BookingController : ControllerBase
     /// </summary>
     /// <remarks>TODO: Trả về QR code cho guest thanh toán</remarks>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(GetDraftBookingDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateBookingAsync(CreateBookingDto createBookingDto)
     {

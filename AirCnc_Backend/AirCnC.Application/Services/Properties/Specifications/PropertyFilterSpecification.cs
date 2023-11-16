@@ -1,6 +1,7 @@
 using AirCnC.Application.Services.Properties.Dtos;
 using AirCnC.Application.Services.Properties.Enums;
 using AirCnC.Domain.Entities;
+using AirCnC.Domain.Enums;
 using AirCnC.Domain.Specification;
 
 namespace AirCnC.Application.Services.Properties.Specifications;
@@ -13,6 +14,8 @@ public class PropertyFilterSpecification : Specification<Property>
         AddInclude(p => p.PropertyReviews);
         AddInclude(p => p.Host.User);
         AddInclude(p => p.Wishlists);
+
+        AddFilter(p => p.Status == PropertyStatus.Approved);
         
         if (hostId > 0)
             AddFilter(p => p.HostId == hostId);

@@ -25,13 +25,17 @@ public class EmailSender : IEmailSender
         _logger.LogInformation($"Email sent to {message.To}.");
     }
     
-    private MimeMessage CreateEmailMessage(Message message)
+    private MimeMessage CreateEmailMessage(Message message, bool isHtml = true)
     {
         var emailMessage = new MimeMessage();
         emailMessage.From.Add(new MailboxAddress(_emailConfig.UserName ,_emailConfig.From));
         emailMessage.To.AddRange(message.To.Select(x => new MailboxAddress(string.Empty, x)));
         emailMessage.Subject = message.Subject;
-        emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
+        // send as html 
+        emailMessage.Body = new TextPart(isHtml ? "html" : "plain")
+        {
+            Text = message.Content
+        };
         return emailMessage;
     }
     private async Task SendAsync(MimeMessage mailMessage)
