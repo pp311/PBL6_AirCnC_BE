@@ -34,4 +34,11 @@ public class HostController : ControllerBase
         var host = await _hostService.GetHostByUserIdAsync(userId);
         return Ok(host);
     }
+    
+    [HttpGet("{hostId:int}/is-stayed")]
+    public async Task<IActionResult> CheckHostIsStayed(int hostId)
+    {
+        var result = await _hostService.CheckHostIsStayedAsync(hostId);
+        return Ok(result);
+    }
 }

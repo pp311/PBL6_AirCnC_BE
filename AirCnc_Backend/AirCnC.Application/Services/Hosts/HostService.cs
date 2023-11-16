@@ -1,4 +1,5 @@
 using AirCnC.Application.Commons;
+using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Bookings.Specifications;
 using AirCnC.Application.Services.Hosts.Dtos;
@@ -16,14 +17,17 @@ public interface IHostService
     Task<GetHostDto> GetHostAsync(int id);
     Task<GetHostDto> GetHostByUserIdAsync(int userId);
     Task<PagedList<GetHostForAdminDto>> GetHostsAsync(PagingParameters pp);
+    Task<bool> CheckHostIsStayedAsync(int hostId);
 }
 public class HostService : IHostService
 {
     private readonly IRepository<Host> _hostRepository;
     private readonly IRepository<HostReview> _hostReviewRepository;
+    private readonly IRepository<Guest> _guestRepository;
     private readonly IRepository<Property> _propertyRepository;
     private readonly IRepository<Booking> _bookingRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUser _currentUser;
     private readonly IMapper _mapper;
 
     public HostService(IRepository<Host> hostRepository, 
@@ -31,13 +35,17 @@ public class HostService : IHostService
                        IUnitOfWork unitOfWork,
                        IRepository<HostReview> hostReviewRepository, 
                        IRepository<Property> propertyRepository,
-                       IRepository<Booking> bookingRepository)
+                       IRepository<Booking> bookingRepository,
+                       IRepository<Guest> guestRepository,
+                       ICurrentUser currentUser)
     {
         _hostRepository = hostRepository;
         _mapper = mapper;
         _hostReviewRepository = hostReviewRepository;
         _propertyRepository = propertyRepository;
         _bookingRepository = bookingRepository;
+        _guestRepository = guestRepository;
+        _currentUser = currentUser;
         _unitOfWork = unitOfWork;
     }
     
@@ -88,5 +96,17 @@ public class HostService : IHostService
             host.TotalIncome= await _bookingRepository.SumAsync(new GetBookingWithHostSpecification(host.Id), b => b.TotalPrice);
         }
         return new PagedList<GetHostForAdminDto>(result, totalCount, pp.PageIndex, pp.PageSize);
+    }
+
+    public async Task<bool> CheckHostIsStayedAsync(int hostId)
+    {
+         var currentUserId = int.TryParse(_currentUser.Id, out var id) ? id : 0;
+         if (currentUserId == 0) return false;
+         
+         var guest = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(currentUserId));
+         if (guest is null) return false;
+ 
+         var spec = new IsGuestStayedInHostPropertySpecification(hostId, guest.Id);
+         return await _bookingRepository.AnyAsync(spec);
     }
 }
