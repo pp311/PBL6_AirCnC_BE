@@ -62,6 +62,7 @@ public class BookingController : ControllerBase
     [HttpPost]
     [Authorize]
     [ProducesResponseType(typeof(GetDraftBookingDto), StatusCodes.Status200OK)]
+    //TODO: remove guestId from CreateBookingDto
     public async Task<IActionResult> CreateBookingAsync(CreateBookingDto createBookingDto)
     {
         var result = await _bookingService.CreateBookingAsync(createBookingDto);
