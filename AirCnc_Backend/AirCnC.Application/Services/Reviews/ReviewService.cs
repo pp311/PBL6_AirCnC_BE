@@ -115,7 +115,8 @@ public class ReviewService : IReviewService
     public async Task<GetReviewDto> CreateHostReviewAsync(int hostId, CreateReviewDto dto)
     {
         dto.RevieweeId = hostId;
-        dto.ReviewerId = int.Parse(_currentUser.Id!);
+        var reviewer = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id!)));
+        dto.ReviewerId = reviewer?.Id ?? throw new EntityNotFoundException(nameof(Guest), _currentUser.Id!);
         
         // Todo: Check if guest has ever booked this host
         
@@ -145,8 +146,10 @@ public class ReviewService : IReviewService
     public async Task<GetReviewDto> CreateGuestReviewAsync(int guestId, CreateReviewDto dto)
     {
         dto.RevieweeId = guestId;
-        dto.ReviewerId = int.Parse(_currentUser.Id!);
-        
+        var reviewer = await _hostRepository.FindOneAsync(new HostByUserIdSpecification(int.Parse(_currentUser.Id!)));
+        dto.ReviewerId = reviewer?.Id ?? throw new EntityNotFoundException(nameof(Guest), _currentUser.Id!);
+
+
         //Todo: Check if host has ever hosted this guest
 
         var host = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id!)));
@@ -175,8 +178,8 @@ public class ReviewService : IReviewService
     public async Task<GetPropertyReviewDto> CreatePropertyReviewAsync(int propertyId, CreatePropertyReviewDto dto)
     {
         dto.PropertyId = propertyId;
-        dto.GuestId = int.Parse(_currentUser.Id!);
-        
+        var guest= await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id!)));
+        dto.GuestId = guest?.Id ?? throw new EntityNotFoundException(nameof(Guest), _currentUser.Id!);
         // Todo: Check if guest has ever booked this property
         
         var isPropertyExist = await _propertyRepository.AnyAsync(propertyId);
