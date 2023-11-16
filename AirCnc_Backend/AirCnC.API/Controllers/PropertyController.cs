@@ -16,6 +16,7 @@ namespace AirCnC.API.Controllers
             _propertyService = productService;
 
         }
+        
         [HttpGet]
         public async Task<IActionResult> GetPropertyList([FromQuery] PropertyQueryParameters pqp)
         {

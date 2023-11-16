@@ -64,10 +64,5 @@ namespace AirCnC.Application.Services.Properties.Dtos
         
         [Required]
         public PropertyUtilityDto PropertyUtilities { get; set; } = new PropertyUtilityDto();
-        [Required]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        [EnumDataType(typeof(PropertyStatus))]
-        public PropertyStatus Status { get; set; } = PropertyStatus.Pending;
-        public string? RejectionReason { get; set; }
     }
 }

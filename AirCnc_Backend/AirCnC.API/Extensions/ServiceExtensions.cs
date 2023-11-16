@@ -3,6 +3,7 @@ using System.Text;
 using AirCnC.API.Common.Identity;
 using AirCnC.Application.BackgroundServices;
 using AirCnC.Application.Commons;
+using AirCnC.Application.Commons.Helpers;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Services.Auth;
 using AirCnC.Application.Services.Bookings;
@@ -218,6 +219,7 @@ public static class ServiceExtensions
     public static IServiceCollection AddEmailSender(this IServiceCollection services)
     {
         services.AddScoped<IEmailSender, EmailSender>();
+        services.AddScoped<IMailTemplateHelper, MailTemplateHelper>();
         return services;
     }
 

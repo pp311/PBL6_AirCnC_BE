@@ -1,6 +1,9 @@
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using AirCnC.Application.Commons;
+using AirCnC.Application.Commons.Helpers;
+using AirCnC.Application.Services.Bookings.Specifications;
+using AirCnC.Application.Services.Email;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Application.Services.Payments.Dtos;
@@ -9,6 +12,7 @@ using AirCnC.Domain.Enums;
 using AirCnC.Domain.Constants;
 using AirCnC.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
+using Message = AirCnC.Application.Services.Email.Message;
 
 
 namespace AirCnC.Application.Services.Payments;
@@ -27,12 +31,15 @@ public class PaymentService : IPaymentService
     private readonly IUnitOfWork _unitOfWork;
     private readonly PaymentConfig _paymentConfig;
     private readonly ILogger<PaymentService> _logger;
-
+    private readonly IMailTemplateHelper _mailTemplateHelper;
+    private readonly IEmailSender _emailSender;
 
     public PaymentService(IRepository<BookingPayment> bookingPaymentRepository, IMapper mapper,
                           IOptions<PaymentConfig> paymentConfig, IUnitOfWork unitOfWork, IRepository<VnpHistory> vnpHistoryRepository,
                           IRepository<Booking> bookingRepository,
-                          ILogger<PaymentService> logger)
+                          ILogger<PaymentService> logger,
+                          IMailTemplateHelper mailTemplateHelper,
+                          IEmailSender emailSender)
     {
         _bookingPaymentRepository = bookingPaymentRepository;
         _mapper = mapper;
@@ -41,6 +48,8 @@ public class PaymentService : IPaymentService
         _vnpHistoryRepository = vnpHistoryRepository;
         _bookingRepository = bookingRepository;
         _logger = logger;
+        _mailTemplateHelper = mailTemplateHelper;
+        _emailSender = emailSender;
     }
 
     public async Task<string> CreateBookingPayment(string ip, CreateBookingPaymentDto createBookingPaymentDto)
@@ -134,11 +143,32 @@ public class PaymentService : IPaymentService
                 vnpHistory.vnp_TransactionStatus = vnpayReturnDto.vnp_TransactionStatus;
                 vnpHistory.BookingPayment.Status = BookingPaymentStatus.Paid;
                 _vnpHistoryRepository.Update(vnpHistory);
-                
-                var booking = await _bookingRepository.GetByIdAsync(vnpHistory.BookingPayment.BookingId);
+
+                var spec = new BookingByIdSpecification(vnpHistory.BookingPayment.BookingId);
+                var booking = await _bookingRepository.FindOneAsync(spec);
                 booking!.Status = BookingStatus.Confirmed;
                 booking.Guid = Guid.NewGuid().ToString();
                 await _unitOfWork.SaveChangesAsync();
+                
+                // Send email to guest
+                var guest = booking.Guest;
+                var property = booking.Property;
+                var host = booking.Property.Host;
+                
+                var bookingInfo = _mailTemplateHelper.GetBookingInfoTemplate(
+                    guest.User.FullName,
+                    booking.CreatedAt,
+                    property.Title,
+                    booking.CheckInDate,
+                    booking.CheckOutDate,
+                    property.Address,
+                    property.City,
+                    host.User.FullName,
+                    host.User.PhoneNumber ?? "",
+                    booking.TotalPrice);
+                
+                var message = new Message(new List<string> {guest.User.Email!}, "AirCnC - Thông tin đặt phòng", bookingInfo);
+                await _emailSender.SendEmailAsync(message);
             }
             else
             {

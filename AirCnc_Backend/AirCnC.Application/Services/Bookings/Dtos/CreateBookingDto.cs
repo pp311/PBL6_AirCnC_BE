@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using AirCnC.Domain.Constants;
 
 namespace AirCnC.Application.Services.Bookings.Dtos;
@@ -6,6 +7,7 @@ namespace AirCnC.Application.Services.Bookings.Dtos;
 public class CreateBookingDto
 {
     public int PropertyId { get; set; }
+    [JsonIgnore]
     public int GuestId { get; set; }
     
     public DateTime CheckInDate { get; set; }

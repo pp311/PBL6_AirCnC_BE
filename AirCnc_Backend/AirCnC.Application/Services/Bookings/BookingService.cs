@@ -1,4 +1,6 @@
 using AirCnC.Application.Commons;
+using AirCnC.Application.Commons.Identity;
+using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Bookings.Dtos;
 using AirCnC.Application.Services.Bookings.Specifications;
 using AirCnC.Domain.Data;
@@ -30,6 +32,7 @@ public class BookingService : IBookingService
     private readonly IMapper _mapper;
     private readonly AirCnCSettings _airCnCSettings;
     private readonly ILogger<BookingService> _logger;
+    private readonly ICurrentUser _currentUser;
 
     public BookingService(IRepository<Booking> bookingRepository,
                           IUnitOfWork unitOfWork,
@@ -37,7 +40,8 @@ public class BookingService : IBookingService
                           IRepository<Property> propertyRepository,
                           IOptions<AirCnCSettings> airCnCSettings,
                           IRepository<Guest> guestRepository,
-                          ILogger<BookingService> logger)
+                          ILogger<BookingService> logger,
+                          ICurrentUser currentUser)
     {
         _bookingRepository = bookingRepository;
         _unitOfWork = unitOfWork;
@@ -45,6 +49,7 @@ public class BookingService : IBookingService
         _propertyRepository = propertyRepository;
         _guestRepository = guestRepository;
         _logger = logger;
+        _currentUser = currentUser;
         _airCnCSettings = airCnCSettings.Value;
     }
 
@@ -74,6 +79,10 @@ public class BookingService : IBookingService
         // Get property info
         var propertyInfo = await _propertyRepository.FindOneAsync(new GetPropertyWithHostSpecification(createBookingDto.PropertyId))
                            ?? throw new EntityNotFoundException(nameof(Property), createBookingDto.PropertyId.ToString());
+        
+        var userId = int.Parse(_currentUser.Id!);
+        createBookingDto.GuestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(userId)))?.Id
+                      ?? throw new EntityNotFoundException(nameof(Guest), userId.ToString());
 
         // Validate input
         await ValidateInput(createBookingDto, propertyInfo);
@@ -123,10 +132,6 @@ public class BookingService : IBookingService
 
     private async Task ValidateInput(CreateBookingDto createBookingDto, Property property)
     {
-        // Check if guest id exists
-        if (await _guestRepository.GetByIdAsync(createBookingDto.GuestId) is null)
-            throw new EntityNotFoundException(nameof(Guest), createBookingDto.GuestId.ToString());
-
         // Check if checkin and checkout date is valid
         if (createBookingDto.CheckInDate.Date >= createBookingDto.CheckOutDate.Date)
             throw new InvalidBookingDateException("Checkin date must be before checkout date");
@@ -156,7 +161,7 @@ public class BookingService : IBookingService
             throw new InvalidGuestCountException($"Number of children must be less than {property.MaxChildCount}");
 
         // Check if guest is booking his own property
-        var guestUserId = (await _guestRepository.GetByIdAsync(createBookingDto.GuestId))!.UserId;
+        var guestUserId = int.Parse(_currentUser.Id!);
         if (guestUserId == property.Host.UserId)
             throw new GuestIsHostException("Guest cannot book his own property");
     }
