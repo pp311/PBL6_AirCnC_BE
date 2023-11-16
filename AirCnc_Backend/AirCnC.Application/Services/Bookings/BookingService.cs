@@ -76,6 +76,10 @@ public class BookingService : IBookingService
     public async Task<GetDraftBookingDto> CreateBookingAsync(CreateBookingDto createBookingDto)
     {
         _logger.LogInformation("Creating booking {@Booking}", createBookingDto);
+        var guest = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id!)));
+        if (guest == null)
+            throw new EntityNotFoundException(nameof(Guest), _currentUser.Id!);
+        createBookingDto.GuestId = guest.Id;
         // Get property info
         var propertyInfo = await _propertyRepository.FindOneAsync(new GetPropertyWithHostSpecification(createBookingDto.PropertyId))
                            ?? throw new EntityNotFoundException(nameof(Property), createBookingDto.PropertyId.ToString());
