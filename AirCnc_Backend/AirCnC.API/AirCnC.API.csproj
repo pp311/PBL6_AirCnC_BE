@@ -46,6 +46,11 @@
   <ItemGroup>
     <Folder Include="https\" />
     <Folder Include="Logs\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\MailTemplates\BookingInfo.html" />
   </ItemGroup>
 
 </Project>

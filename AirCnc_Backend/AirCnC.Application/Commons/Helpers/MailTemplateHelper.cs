@@ -69,6 +69,6 @@ public class MailTemplateHelper : IMailTemplateHelper
 
     private string GetTemplatePath(string templateName)
     {
-        return $"{_env.ContentRootPath}{Path.DirectorySeparatorChar}MailTemplates{Path.DirectorySeparatorChar}{templateName}.html";
+        return $"{_env.ContentRootPath}{Path.DirectorySeparatorChar}wwwroot{Path.DirectorySeparatorChar}MailTemplates{Path.DirectorySeparatorChar}{templateName}.html";
     }
 }
