@@ -64,8 +64,8 @@ public class ReviewService : IReviewService
     {
         var property = await _propertyRepository.FindOneAsync(new PropertyDetailSpecification(propertyId))
             ?? throw new EntityNotFoundException(nameof(Property), propertyId.ToString());
-        
-        var propertyReviewInfo = new PropertyReviewInfoDto
+        if (property.PropertyReviews.Count == 0) return new PropertyReviewInfoDto();
+        var propertyReviewInfo = new PropertyReviewInfoDto()
         {
             NumberOfReviews = property.PropertyReviews.Count,
             Cleanliness = property.PropertyReviews.Average(r => r.Cleanliness),
@@ -251,9 +251,8 @@ public class ReviewService : IReviewService
 
         if (currentUserRole != AppRole.Admin)
         {
-            var hostId = (await _hostRepository.FindOneAsync(new HostByUserIdSpecification(currentUserId)))!.Id;
-            if (propertyReview.Property.HostId != hostId) 
-                throw new ForbiddenAccessException("You are not the owner of this review");
+            if (propertyReview.GuestId!= currentUserId) 
+                throw new ForbiddenAccessException("You don't have permission of this review");
         }
         
         _propertyReviewRepository.Delete(propertyReview);
