@@ -43,13 +43,13 @@ public class AuthController : ControllerBase
 	[HttpPost("log-in")]
 	public async Task<IActionResult> Login([FromBody] LoginDto logInDto)
 	{
-		var role = logInDto.Role?.ToLower() switch
-		{
-			"admin" => AppRole.Admin,
-			"user" => AppRole.User,
-			_ => throw new ArgumentException("Invalid role")
-		};
-		var result = await _authenticateService.LoginAsync(logInDto, role);
+		//var role = logInDto.Role?.ToLower() switch
+		//{
+		//	"admin" => AppRole.Admin,
+		//	"user" => AppRole.User,
+		//	_ => throw new ArgumentException("Invalid role")
+		//};
+		var result = await _authenticateService.LoginAsync(logInDto, AppRole.User);
 		return Ok(result);
 	}
 	

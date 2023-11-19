@@ -11,6 +11,7 @@ using Google.Apis.Oauth2.v2;
 using Google.Apis.Oauth2.v2.Data;
 using Google.Apis.Services;
 using Microsoft.AspNetCore.Identity;
+using System.Data;
 
 namespace AirCnC.Application.Services.Auth;
 
@@ -119,7 +120,7 @@ public class AuthService : IAuthService
         }).Userinfo.Get().ExecuteAsync();
 
         var user = await GetOrCreateUserAsync(userInfo);
-
+        var role = _userManager.GetRolesAsync(user).Result.First();
         var userDto = _mapper.Map<GetUserDto>(user);
         userDto.IsHost = await _hostRepository.AnyAsync(new HostByUserIdSpecification(user.Id));
         
@@ -127,7 +128,8 @@ public class AuthService : IAuthService
         {
             AccessToken = await _tokenService.GenerateAccessTokenAsync(user.Id),
             RefreshToken = _tokenService.GenerateRefreshToken(),
-            User = userDto
+            User = userDto,
+            Role = role
         };
 
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);
@@ -143,14 +145,7 @@ public class AuthService : IAuthService
         if (user == null)
             throw new UserNotFoundException(logInDto.Identifier);
 
-        var isAdmin = await _userManager.IsInRoleAsync(user, AppRole.Admin);
-        switch (role)
-        {
-            case AppRole.Admin when !isAdmin:
-                throw new UserNotFoundException(logInDto.Identifier);
-            case AppRole.User when isAdmin:
-                throw new UserNotFoundException(logInDto.Identifier);
-        }
+        role = _userManager.GetRolesAsync(user).Result.First();
 
 
         var isValid = await _userManager.CheckPasswordAsync(user, logInDto.Password);
@@ -164,7 +159,8 @@ public class AuthService : IAuthService
         {
             AccessToken = await _tokenService.GenerateAccessTokenAsync(user.Id),
             RefreshToken = _tokenService.GenerateRefreshToken(),
-            User = userDto
+            User = userDto,
+            Role = role
         };
         
         await _tokenService.AddRefreshTokenAsync(user.Id, tokenDto.RefreshToken);

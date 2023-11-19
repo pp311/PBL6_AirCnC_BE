@@ -9,4 +9,5 @@ public class TokenDto
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public GetUserDto User { get; set; } = null!;
+    public string Role { get; set; } = null!;
 }
