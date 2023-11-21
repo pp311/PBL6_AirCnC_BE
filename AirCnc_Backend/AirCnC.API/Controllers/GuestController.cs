@@ -1,4 +1,5 @@
 using AirCnC.Application.Services.Guests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers;
@@ -25,6 +26,7 @@ public class GuestController : ControllerBase
     /// Check xem guest đã từng ở tại property của host hay chưa (nếu mình không phải host hoặc chưa login thì luôn false)
     /// </summary>
     [HttpGet("{guestId:int}/is-stayed")]
+    [Authorize]
     public async Task<IActionResult> CheckGuestIsStayed(int guestId)
     {
         var result = await _guestService.CheckGuestIsStayedAsync(guestId);
