@@ -8,15 +8,23 @@ namespace AirCnC.Application.Services.Properties.Specifications;
 
 public class PropertyFilterSpecification : Specification<Property>
 {
-    public PropertyFilterSpecification(PropertyQueryParameters pqp, int hostId = 0)
+    public PropertyFilterSpecification(PropertyQueryParameters pqp, string role, int hostId = 0 )
     {
         AddInclude(p => p.PropertyImages);
         AddInclude(p => p.PropertyReviews);
         AddInclude(p => p.Host.User);
         AddInclude(p => p.Wishlists);
 
-        AddFilter(p => p.Status == PropertyStatus.Approved);
-        
+        if (role == "Admin")
+        {
+            if (pqp.Status is not null)
+                AddFilter(p => p.Status == pqp.Status);
+        }
+        else
+        {
+            AddFilter(p => p.Status == PropertyStatus.Approved);
+        }
+
         if (hostId > 0)
             AddFilter(p => p.HostId == hostId);
         
