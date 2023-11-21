@@ -65,7 +65,7 @@ public class AttachmentController : ControllerBase
     
     private static void ValidateImage(IFormFile file)
     {
-        var ext = Path.GetExtension(file.FileName);
+        var ext = Path.GetExtension(file.FileName).ToLower();
         if (ext != ".jpg" && ext != ".png" && ext != ".jpeg")
             throw new InvalidMediaFormatException();
 
@@ -79,7 +79,7 @@ public class AttachmentController : ControllerBase
     // for both image and video
     private static void ValidateMedia(IFormFile file)
     {
-        var ext = Path.GetExtension(file.FileName);
+        var ext = Path.GetExtension(file.FileName).ToLower();
         if (ext != ".jpg" && ext != ".png" && ext != ".jpeg" && ext != ".mp4")
             throw new InvalidMediaFormatException();
         
