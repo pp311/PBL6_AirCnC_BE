@@ -1,5 +1,6 @@
 using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Hosts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers;
@@ -36,6 +37,7 @@ public class HostController : ControllerBase
     }
     
     [HttpGet("{hostId:int}/is-stayed")]
+    [Authorize]
     public async Task<IActionResult> CheckHostIsStayed(int hostId)
     {
         var result = await _hostService.CheckHostIsStayedAsync(hostId);
