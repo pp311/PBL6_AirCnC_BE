@@ -54,7 +54,8 @@ public class PropertyService : IPropertyService
     public async Task<PagedList<GetPropertyDto>> GetListByHostIdAsync(int hostId, PropertyQueryParameters pqp)
     {
         // t luoi nen dung lai cai spec nay
-        var propertyFilterSpec = new PropertyFilterSpecification(pqp, hostId);
+        var role = _currentUser.Role;
+        var propertyFilterSpec = new PropertyFilterSpecification(pqp, role, hostId);
 
         var (items, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertyFilterSpec);
         var propertyList = items.ToList();
@@ -98,7 +99,8 @@ public class PropertyService : IPropertyService
 
     public async Task<PagedList<GetPropertyDto>> GetListAsync(PropertyQueryParameters pqp)
     {
-        var propertyFilterSpec = new PropertyFilterSpecification(pqp);
+        var role = _currentUser.Role;
+        var propertyFilterSpec = new PropertyFilterSpecification(pqp,role);
 
         var (items, totalCount) = await _propertyRepository.FindWithTotalCountAsync(propertyFilterSpec);
         
@@ -109,7 +111,15 @@ public class PropertyService : IPropertyService
         // Neu user da dang nhap thi moi check xem property co phai la favorite cua user hay khong
         var currentGuestId = 0;
         if (!string.IsNullOrWhiteSpace(_currentUser.Id))
-            currentGuestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id))))!.Id;
+        {
+            var currentGuest = await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(int.Parse(_currentUser.Id)));
+            if (currentGuest is not null)
+                currentGuestId = currentGuest.Id;
+            else
+            {
+                currentGuestId = 0;
+            }                
+        }
 
         foreach (var item in result)
         {
