@@ -25,7 +25,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserList([FromQuery] PagingParameters pqp)
+    public async Task<IActionResult> GetUserList([FromQuery] UserPagingParameters pqp)
     {
         var result = await _userService.GetUsersAsync(pqp);
         return Ok(result);

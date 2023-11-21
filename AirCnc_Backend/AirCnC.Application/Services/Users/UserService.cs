@@ -1,4 +1,5 @@
-﻿using AirCnC.Application.Commons;
+﻿using System.Linq.Dynamic.Core;
+using AirCnC.Application.Commons;
 using AirCnC.Application.Services.Users.Dtos;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
@@ -12,7 +13,7 @@ namespace AirCnC.Application.Services.Users
     public interface IUserService
     {
         Task<GetUserForAdminDto> GetUserAsync(int id);
-        Task<PagedList<GetUserForAdminDto>> GetUsersAsync(PagingParameters pp);
+        Task<PagedList<GetUserForAdminDto>> GetUsersAsync(UserPagingParameters pp);
         Task<GetUserForAdminDto> UpdateUserAsync(int id, UpdateUserInfoDto dto);
     }
 
@@ -46,7 +47,7 @@ namespace AirCnC.Application.Services.Users
             return result;
         }
 
-        public async Task<PagedList<GetUserForAdminDto>> GetUsersAsync(PagingParameters pp)
+        public async Task<PagedList<GetUserForAdminDto>> GetUsersAsync(UserPagingParameters pp)
         {
             var skip = (pp.PageIndex - 1) * pp.PageSize;
             var take = pp.PageSize;
@@ -57,6 +58,7 @@ namespace AirCnC.Application.Services.Users
                             .Include(u => u.Host)
                             .Include(u => u.Guest)
                             .Where(u => adminIds.All(id => id != u.Id))
+                            .Where(u => !pp.IsHostOnly || u.Host != null)
                             .OrderBy(i => pp.IsDescending ? -i.Id : i.Id)
                             .Skip(skip)
                             .Take(take)
@@ -64,6 +66,7 @@ namespace AirCnC.Application.Services.Users
             
             var totalCount = await _userManager.Users
                             .Where(u => adminIds.All(id => id != u.Id))
+                            .Where(u => !pp.IsHostOnly || u.Host != null)
                             .CountAsync();
 
             var result = _mapper.Map<List<GetUserForAdminDto>>(users);
