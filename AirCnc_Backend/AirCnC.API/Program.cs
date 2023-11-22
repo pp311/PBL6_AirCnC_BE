@@ -27,6 +27,7 @@ builder.Services.AddDbContext(builder.Configuration)
     .AddCloudinary(builder.Configuration)
     .AddQuartz()
     .AddLogging(builder.Configuration)
+    .AddHttpClient()
     .AddSignalR();
 
 builder.Services.AddAutoMapper(typeof(IApplicationAssemblyMarker));
