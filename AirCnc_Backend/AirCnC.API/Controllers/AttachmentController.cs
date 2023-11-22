@@ -63,6 +63,54 @@ public class AttachmentController : ControllerBase
         return Ok(url);
     }
     
+    /// <summary>
+    /// Dùng để upload avatar, sẽ bị resize hoặc downgrade, chỉ cho phép file ảnh, dung lượng tối đa 5MB
+    /// </summary>
+    /// <remarks>Test bằng postman, với key là "file" (https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman)</remarks>
+    [HttpPost("avatar-v2")]
+    public async Task<IActionResult> UploadAvatarImageV2([FromForm] IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("File is empty");
+        
+        ValidateImage(file);
+
+        var url = await _imageUploader.UploadAvatarImageV2Async(file.FileName, file.OpenReadStream());
+        return Ok(url);
+    }
+    
+    /// <summary>
+    /// Dùng cho ảnh phòng, không bị resize nhưng max size 5MB, FE có thể tự check hoặc đợi response lỗi từ BE
+    /// </summary>
+    /// <remarks>Test bằng postman, với key là "file" (https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman)</remarks>
+    [HttpPost("property-v2")]
+    public async Task<IActionResult> UploadPropertyImageV2([FromForm] IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("File is empty");
+        
+        ValidateImage(file);
+
+        var url = await _imageUploader.UploadAvatarImageV2Async(file.FileName, file.OpenReadStream());
+        return Ok(url);
+    }
+    
+    /// <summary>
+    /// Dùng để upload ảnh hoặc video, hiện tại max size 10MB, dùng cho mấy cái phản hồi đòi cancel các thứ
+    /// </summary>
+    /// <remarks>Test bằng postman, với key là "file" (https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman)</remarks>
+    [HttpPost("media-v2")]
+    public async Task<IActionResult> UploadMediaFileV2([FromForm] IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("File is empty");
+        
+        ValidateMedia(file);
+
+        var url = await _imageUploader.UploadAvatarImageV2Async(file.FileName, file.OpenReadStream());
+        return Ok(url);
+    }
+    
     private static void ValidateImage(IFormFile file)
     {
         var ext = Path.GetExtension(file.FileName).ToLower();
