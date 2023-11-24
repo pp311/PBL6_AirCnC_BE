@@ -44,7 +44,7 @@ namespace AirCnC.Application.Commons
 
         #region Request
 
-        public string CreateRequestUrl(string baseUrl, string vnpHashSecret, VnpHistoryDto vnpHistoryDto)
+        public string CreateRequestUrl(string baseUrl, string vnpHashSecret, VnpHistoryDto? vnpHistoryDto)
         {
             StringBuilder data = new StringBuilder();
             foreach (KeyValuePair<string, string> kv in _requestData)
@@ -65,7 +65,8 @@ namespace AirCnC.Application.Commons
             }
             var vnpSecureHash = Utils.HmacSha512(vnpHashSecret , signData);
             baseUrl += "vnp_SecureHash=" + vnpSecureHash;
-            vnpHistoryDto.vnp_SecureHash = vnpSecureHash;
+            if (vnpHistoryDto != null)
+                vnpHistoryDto.vnp_SecureHash = vnpSecureHash;
             return baseUrl;
         }
 
