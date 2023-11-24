@@ -1,4 +1,4 @@
-using AirCnC.Application.Commons;
+﻿using AirCnC.Application.Commons;
 using AirCnC.Application.Commons.Identity;
 using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Bookings.Specifications;
@@ -10,6 +10,14 @@ using AirCnC.Domain.Enums;
 using AirCnC.Domain.Exceptions;
 using AirCnC.Domain.Exceptions.BookingCancellationException;
 using AutoMapper;
+using System.Configuration;
+using System.Net;
+using Newtonsoft.Json;
+using AirCnC.Application.Services.Payments.Dtos;
+using Microsoft.Extensions.Options;
+using AirCnC.Application.Commons;
+using RestSharp;
+using System.Text;
 
 namespace AirCnC.Application.Services.Cancellations;
 
@@ -28,9 +36,13 @@ public class CancellationService : ICancellationService
     private readonly IRepository<Booking> _bookingRepository;
     private readonly IRepository<Guest> _guestRepository;
     private readonly IRepository<Host> _hostRepository;
+    private readonly IRepository<VnpHistory> _vnpHistoryRepository;
+    private readonly IRepository<RefundPayment> _refundPaymentRepository;
+    private readonly IRepository<ChargePayment> _chargePaymentRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ICurrentUser _currentUser;
+    private readonly PaymentConfig _paymentConfig;
 
     public CancellationService(IRepository<CancellationTicket> cancellationTicketsRepository,
                                IMapper mapper,
@@ -38,7 +50,9 @@ public class CancellationService : ICancellationService
                                IRepository<Booking> bookingRepository,
                                ICurrentUser currentUser,
                                IRepository<Guest> guestRepository,
-                               IRepository<Host> hostRepository)
+                               IRepository<Host> hostRepository,IRepository<VnpHistory> vnpHistoryRepository,
+                               IRepository<RefundPayment> refundPaymentRepository,
+                               IRepository<ChargePayment> chargePaymentRepository, IOptions<PaymentConfig> paymentConfig)
     {
         _cancellationTicketsRepository = cancellationTicketsRepository;
         _mapper = mapper;
@@ -47,6 +61,10 @@ public class CancellationService : ICancellationService
         _currentUser = currentUser;
         _guestRepository = guestRepository;
         _hostRepository = hostRepository;
+        _vnpHistoryRepository = vnpHistoryRepository;
+        _refundPaymentRepository = refundPaymentRepository;
+        _chargePaymentRepository = chargePaymentRepository;
+        _paymentConfig = paymentConfig.Value;
     }
 
     public async Task<GetCancellationDto> CreateCancellationTicketAsync(CreateCancellationDto dto)
@@ -185,12 +203,44 @@ public class CancellationService : ICancellationService
         booking.Status = cancellationTicket.CreatedAt < booking.CheckInDate 
                              ? BookingStatus.CancelledBeforeCheckIn 
                              : BookingStatus.CancelledAfterCheckIn;
-
+        
         cancellationTicket.RefundAmount = dto.RefundAmount;
         cancellationTicket.ChargeAmount = dto.ChargeAmount;
         
         //Todo: create refund payment & charge payment
-        
+        var bookingPayment = booking.BookingPayment;
+        if(bookingPayment is null)
+            throw new EntityNotFoundException(nameof(BookingPayment), booking.Id.ToString());
+        var vnpHistory = bookingPayment.VnpHistories.FirstOrDefault();
+        if (dto.RefundAmount!=0)
+        {
+            var refundPayment = (cancellationTicket.RefundPayment is not null)?cancellationTicket.RefundPayment : new RefundPayment
+            {
+                PaymentCode = Guid.NewGuid().ToString(),
+                BookingPaymentCode = bookingPayment.PaymentCode,
+                GuestId = booking.GuestId,
+                Amount = cancellationTicket.RefundAmount,
+                CancellationTicket = cancellationTicket,
+                Status = RefundPaymentStatus.Pending
+            };
+            await Refund(vnpHistory, refundPayment, "0.0.0.0");
+            cancellationTicket.RefundPayment = refundPayment;
+        }
+
+        if (dto.ChargeAmount != 0)
+        {
+            var chargePayment =(cancellationTicket.ChargePayment is not null)?cancellationTicket.ChargePayment: new ChargePayment
+            {
+                PaymentCode = Guid.NewGuid().ToString(),
+                BookingPaymentCode = bookingPayment.PaymentCode,
+                HostId = booking.Property.HostId,
+                CancellationTicket = cancellationTicket,
+                Amount = cancellationTicket.ChargeAmount,
+                Status = ChargePaymentStatus.Pending
+            };
+            cancellationTicket.ChargePayment = chargePayment;
+        }
+    
         await _unitOfWork.SaveChangesAsync();
     }
     
@@ -242,6 +292,100 @@ public class CancellationService : ICancellationService
             throw new BookingCancellationException("You can only cancel bookings at least 1 day before check-out date");      
 
         return booking;
+    }
+
+    private async Task Refund(VnpHistory vnpHistory, RefundPayment refundPayment,string ip)
+    {
+        var vnp_Api = _paymentConfig.VnpAPI;
+        var vnp_HashSecret = _paymentConfig.VnpHashSecret;
+        var vnp_TmnCode = _paymentConfig.VnpTmnCode;
+
+        var vnp_RequestId = DateTime.Now.Ticks.ToString(); 
+        var vnp_Version = VnPayLibrary.Version; //2.1.0
+        var vnp_Command = "refund";
+        var vnp_TransactionType = "03";
+        var vnp_Amount = Convert.ToInt64(refundPayment.Amount*100);
+        var vnp_TxnRef = vnpHistory.vnp_TxnRef;
+        var vnp_OrderInfo = "Hoan tien giao dich:" +vnpHistory.vnp_TxnRef;
+        var vnp_TransactionNo = ""; 
+        var vnp_TransactionDate = vnpHistory.vnp_CreateDate;
+        var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+        var vnp_CreateBy = "admin";
+        var vnp_IpAddr = ip;
+
+        var signData = vnp_RequestId + "|" + vnp_Version + "|" + vnp_Command + "|" 
+                           + vnp_TmnCode + "|" + vnp_TransactionType + "|" + vnp_TxnRef + "|" 
+                           + vnp_Amount + "|" + vnp_TransactionNo + "|" + vnp_TransactionDate + "|"
+                           + vnp_CreateBy + "|" + vnp_CreateDate + "|" + vnp_IpAddr + "|" + vnp_OrderInfo;
+        var vnp_SecureHash = Utils.HmacSha512(vnp_HashSecret, signData);
+
+        var rfData = new
+        {
+            vnp_RequestId = vnp_RequestId,
+            vnp_Version = vnp_Version,
+            vnp_Command = vnp_Command,
+            vnp_TmnCode = vnp_TmnCode,
+            vnp_TransactionType = vnp_TransactionType,
+            vnp_TxnRef = vnp_TxnRef,
+            vnp_Amount = vnp_Amount,
+            vnp_OrderInfo = vnp_OrderInfo,
+            vnp_TransactionNo = vnp_TransactionNo,
+            vnp_TransactionDate = vnp_TransactionDate,
+            vnp_CreateBy = vnp_CreateBy,
+            vnp_CreateDate = vnp_CreateDate,
+            vnp_IpAddr = vnp_IpAddr,
+            vnp_SecureHash = vnp_SecureHash
+
+        };
+        var jsonData =  JsonConvert.SerializeObject(rfData);
+
+        using (HttpClient client = new HttpClient())
+        {
+
+            StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+            // Make a POST request to the API
+            HttpResponseMessage response = await client.PostAsync(vnp_Api, content);
+
+            // Check if the request was successful (status code 200-299)
+            if (response.IsSuccessStatusCode)
+            {
+                // Read and display the response content
+                string responseContent = await response.Content.ReadAsStringAsync();
+                var responseData = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseContent);
+                var code = responseData["vnp_ResponseCode"].ToString();
+                switch (code)
+                {
+                    case "00":
+                        refundPayment.Status = RefundPaymentStatus.Success;
+                        break;
+                    case "03":
+                        throw new BadInputException("Dữ liệu gửi sang không đúng định dạng");
+                    case "02":
+                        throw new BadInputException("kiểm tra lại TmnCode");
+                    case "91":
+                        throw new EntityNotFoundException(nameof(refundPayment),refundPayment.PaymentCode);
+                    case "94":
+                        refundPayment.Status = RefundPaymentStatus.Pending;
+                        throw new EntityAlreadyExistedException(nameof(refundPayment),refundPayment.PaymentCode);
+                    case "95":
+                        throw new ForbiddenAccessException("Giao dịch này không thành công bên VNPAY. VNPAY từ chối xử lý yêu cầu");
+                    case "97":
+                        throw new ForbiddenAccessException("Checksum không hợp lệ");
+                    case "99":
+                        throw new ForbiddenAccessException("Lỗi không xác định");
+                    default:
+                        refundPayment.Status = RefundPaymentStatus.Pending;
+                        break;
+                }
+                Console.WriteLine(responseContent);
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+            }
+        }
+
     }
 }
 

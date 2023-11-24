@@ -2,6 +2,8 @@ namespace AirCnC.Application.Services.Payments.Dtos
 {
     public class PaymentConfig
     {
+        public string VnpAPI { get; set; }=null!;
+
         public string VnpReturnUrl { get; set; } = null!;
         public string VnpUrl { get; set; } = null!;
         public string VnpTmnCode { get; set; } = null!;
