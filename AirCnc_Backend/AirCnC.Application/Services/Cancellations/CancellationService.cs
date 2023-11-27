@@ -4,20 +4,19 @@ using AirCnC.Application.Commons.Specifications;
 using AirCnC.Application.Services.Bookings.Specifications;
 using AirCnC.Application.Services.Cancellations.Dtos;
 using AirCnC.Application.Services.Cancellations.Specifications;
+using AirCnC.Application.Services.Email;
 using AirCnC.Domain.Data;
 using AirCnC.Domain.Entities;
 using AirCnC.Domain.Enums;
 using AirCnC.Domain.Exceptions;
 using AirCnC.Domain.Exceptions.BookingCancellationException;
 using AutoMapper;
-using System.Configuration;
-using System.Net;
-using Newtonsoft.Json;
 using AirCnC.Application.Services.Payments.Dtos;
 using Microsoft.Extensions.Options;
-using AirCnC.Application.Commons;
-using RestSharp;
 using System.Text;
+using AirCnC.Application.Commons.Helpers;
+using Newtonsoft.Json;
+using Message = AirCnC.Application.Services.Email.Message;
 
 namespace AirCnC.Application.Services.Cancellations;
 
@@ -43,6 +42,8 @@ public class CancellationService : ICancellationService
     private readonly IMapper _mapper;
     private readonly ICurrentUser _currentUser;
     private readonly PaymentConfig _paymentConfig;
+    private readonly IEmailSender _emailSender;
+    private readonly IMailTemplateHelper _mailTemplateHelper;
 
     public CancellationService(IRepository<CancellationTicket> cancellationTicketsRepository,
                                IMapper mapper,
@@ -50,9 +51,13 @@ public class CancellationService : ICancellationService
                                IRepository<Booking> bookingRepository,
                                ICurrentUser currentUser,
                                IRepository<Guest> guestRepository,
-                               IRepository<Host> hostRepository,IRepository<VnpHistory> vnpHistoryRepository,
+                               IRepository<VnpHistory> vnpHistoryRepository,
                                IRepository<RefundPayment> refundPaymentRepository,
-                               IRepository<ChargePayment> chargePaymentRepository, IOptions<PaymentConfig> paymentConfig)
+                               IRepository<ChargePayment> chargePaymentRepository, 
+                               IOptions<PaymentConfig> paymentConfig,
+                               IRepository<Host> hostRepository,
+                               IEmailSender emailSender,
+                               IMailTemplateHelper mailTemplateHelper)
     {
         _cancellationTicketsRepository = cancellationTicketsRepository;
         _mapper = mapper;
@@ -65,6 +70,8 @@ public class CancellationService : ICancellationService
         _refundPaymentRepository = refundPaymentRepository;
         _chargePaymentRepository = chargePaymentRepository;
         _paymentConfig = paymentConfig.Value;
+        _emailSender = emailSender;
+        _mailTemplateHelper = mailTemplateHelper;
     }
 
     public async Task<GetCancellationDto> CreateCancellationTicketAsync(CreateCancellationDto dto)
@@ -72,6 +79,8 @@ public class CancellationService : ICancellationService
         var booking = await ValidateCreateCancellation(dto);
 
         var cancellationTicket = _mapper.Map<CancellationTicket>(dto);
+
+        var payoutAmount = 0.0;
 
         cancellationTicket.Status = CancellationTicketStatus.Pending;
         cancellationTicket.IsIssuerGuest = dto.IsGuest;
@@ -101,11 +110,13 @@ public class CancellationService : ICancellationService
                     // Neu cancel sau checkin: tinh tien = so dem da o + 1 va co clean fee
                     var stayedFee = booking.PricePerNight * ((DateTime.Now.Date - booking.CheckInDate.Date).Days + 1);
                     cancellationTicket.RefundAmount = booking.TotalPrice - (stayedFee + booking.CleaningFee);
+                    payoutAmount = stayedFee * 0.97 + booking.CleaningFee;
                 }
                 else if (cancellationTicket.Type == CancellationTicketType.CancelledBeforeCheckIn)
                 {
                     // Neu cancel trong vong 24h truoc check-in: tinh tien = 1 dem
                     cancellationTicket.RefundAmount = booking.TotalPrice - booking.PricePerNight;
+                    payoutAmount = booking.PricePerNight * 0.97;
                 }
                 else
                     cancellationTicket.RefundAmount = booking.TotalPrice;
@@ -165,8 +176,20 @@ public class CancellationService : ICancellationService
             }
         }
         
+        // Todo: add payment cac loai (refund, charge, payout)
         _cancellationTicketsRepository.Add(cancellationTicket);
         await _unitOfWork.SaveChangesAsync(); 
+        
+        // Get lai cancellation ticket voi day du thong tin
+        // Todo: Move mail sang background job
+        cancellationTicket = await _cancellationTicketsRepository.FindOneAsync(new CancellationByIdSpecification(cancellationTicket.Id))
+                             ?? throw new EntityNotFoundException(nameof(CancellationTicket), cancellationTicket.Id.ToString());
+
+        if (cancellationTicket.IsIssuerGuest)
+        {
+            await SendCancellationEmailToGuestAsync(cancellationTicket);
+            await SendCancellationNotiToHostAsync(cancellationTicket, payoutAmount);
+        }
         
         return _mapper.Map<GetCancellationDto>(cancellationTicket);
     }
@@ -207,7 +230,7 @@ public class CancellationService : ICancellationService
         cancellationTicket.RefundAmount = dto.RefundAmount;
         cancellationTicket.ChargeAmount = dto.ChargeAmount;
         
-        //Todo: create refund payment & charge payment
+        //Todo: create refund payment & charge payment      
         var bookingPayment = booking.BookingPayment;
         if(bookingPayment is null)
             throw new EntityNotFoundException(nameof(BookingPayment), booking.Id.ToString());
@@ -385,8 +408,60 @@ public class CancellationService : ICancellationService
                 Console.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
             }
         }
-
     }
+
+    private async Task SendCancellationEmailToGuestAsync(CancellationTicket cancellationTicket)
+    {
+        var guest = cancellationTicket.IsIssuerGuest
+            ? await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(cancellationTicket.CreatedBy!.Value))
+            : await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(cancellationTicket.TheOtherPartyId));
+
+        var booking = cancellationTicket.Booking;
+        var property = cancellationTicket.Booking.Property;
+        var host = property.Host;
+
+        var template = _mailTemplateHelper.GetGuestCancellationTemplate(
+                guest!.User.FullName,
+                booking.CreatedAt,
+                booking.Property.Title,
+                booking.CheckInDate,
+                booking.CheckOutDate,
+                property.Address,
+                property.City,
+                host.User.FullName,
+                host.User.PhoneNumber ?? "",
+                booking.TotalPrice,
+                cancellationTicket.Type.ToString(),
+                cancellationTicket.RefundAmount);
+        var message = new Message(new List<string> {guest.User.Email!}, "AirCnC - Thông tin hủy phòng", template);
+        await _emailSender.SendEmailAsync(message);
+    }
+    
+    private async Task SendCancellationNotiToHostAsync(CancellationTicket cancellationTicket, double payoutAmount)
+    {
+        var host = cancellationTicket.IsIssuerGuest
+            ? await _hostRepository.FindOneAsync(new HostByUserIdSpecification(cancellationTicket.TheOtherPartyId))
+            : await _hostRepository.FindOneAsync(new HostByUserIdSpecification(cancellationTicket.CreatedBy!.Value));
+
+        var booking = cancellationTicket.Booking;
+        var property = cancellationTicket.Booking.Property;
+        var guest = booking.Guest;
+
+        var template = _mailTemplateHelper.GetGuestCancellationHostNotiTemplate(
+            guest!.User.FullName,
+            cancellationTicket.CreatedAt,
+            property.Title,
+            booking.CheckInDate,
+            booking.CheckOutDate,
+            property.Address,
+            property.City,
+            booking.TotalPrice,
+            cancellationTicket.Type.ToString(),
+            payoutAmount);
+        var message = new Message(new List<string> {host.User.Email!}, "AirCnC - Thông tin hủy phòng", template);
+        await _emailSender.SendEmailAsync(message);
+    }
+
 }
 
 public class CancellationMappingProfile : Profile
