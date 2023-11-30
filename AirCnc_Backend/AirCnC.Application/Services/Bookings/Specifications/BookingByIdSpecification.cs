@@ -11,6 +11,7 @@ public class BookingByIdSpecification : Specification<Booking>
         AddInclude($"{nameof(Guest)}.{nameof(User)}");
         AddInclude(b=>b.BookingPayment);
         AddInclude(b=>b.BookingPayment.VnpHistories);
+        AddInclude(b=>b.Property.Host.PaymentInfo);
         AddFilter(b => b.Id == id);
     } 
 }

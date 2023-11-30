@@ -254,6 +254,13 @@ public static class ServiceExtensions
                             .WithSimpleSchedule(schedule =>
                                 schedule.WithIntervalInMinutes(3)
                                         .RepeatForever()));
+            
+            // Run at 12:00 PM every day
+            var jobKey2 = new JobKey("MarkCheckoutDateBookingJob");
+            options.AddJob<MarkCheckOutJob>(jobKey2)
+                   .AddTrigger(trigger =>
+                        trigger.ForJob(jobKey2)
+                            .WithCronSchedule("0 0 12 * * ? *"));
         });
 
         services.AddQuartzHostedService(options =>

@@ -63,7 +63,7 @@ public class CancellationController : ControllerBase
     {
         if (dto is null)
             return BadRequest();
-        await _cancellationService.AcceptCancellationTicketAsync(cancellationTicketId, dto);
+        await _cancellationService.AcceptCancellationTicketAsync(cancellationTicketId, dto.ResolveNote,dto.RefundAmount,dto.ChargeAmount);
         return NoContent();
     }
 }

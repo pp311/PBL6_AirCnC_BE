@@ -1,5 +1,7 @@
-﻿using AirCnC.Application.Services.Payments;
+﻿using AirCnC.Application.Commons;
+using AirCnC.Application.Services.Payments;
 using AirCnC.Application.Services.Payments.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirCnC.API.Controllers
@@ -33,6 +35,22 @@ namespace AirCnC.API.Controllers
         {
             await _paymentService.ReceiveDataFromVnp(vnpayData);
             return Ok(vnpayData);
+        }
+
+        [HttpGet("charge-Payment")]
+        [Authorize]
+        public async Task<IActionResult> ChargePayment([FromQuery] ChargePaymentQueryParameter pqp)
+        {
+            var result = await _paymentService.ChargePayment(pqp);
+            return Ok(result);
+        }
+
+        [HttpGet("refund-Payment")]
+        [Authorize]
+        public async Task<IActionResult> RefundPayment([FromQuery] RefundPaymentQueryParameter pqp)
+        {
+            var result= await _paymentService.RefundPayment(pqp);
+            return Ok(result);
         }
     }
 }
