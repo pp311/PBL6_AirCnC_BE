@@ -180,13 +180,22 @@ public class CancellationService : ICancellationService
                 cancellationTicket.ChargeAmount = 0;
             }
         }
-        
-        // Todo: add payment cac loai (refund, charge, payout)
-        _cancellationTicketsRepository.Add(cancellationTicket);
-        await _unitOfWork.SaveChangesAsync(); 
-        await AcceptCancellationTicketAsync(cancellationTicket.Id, cancellationTicket.ResolveNote, cancellationTicket.RefundAmount, 
-                                            cancellationTicket.ChargeAmount,payoutAmount);
-        
+
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            _cancellationTicketsRepository.Add(cancellationTicket);
+            await _unitOfWork.SaveChangesAsync(); 
+            await AcceptCancellationTicketAsync(cancellationTicket.Id, cancellationTicket.ResolveNote, cancellationTicket.RefundAmount, 
+                                                cancellationTicket.ChargeAmount,payoutAmount);
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
         // Get lai cancellation ticket voi day du thong tin
         // Todo: Move mail sang background job
         cancellationTicket = await _cancellationTicketsRepository.FindOneAsync(new CancellationByIdSpecification(cancellationTicket.Id))
@@ -280,8 +289,6 @@ public class CancellationService : ICancellationService
             };
             _hostPaymentRepository.Add(payoutPayment);
         }
-    
-        await _unitOfWork.SaveChangesAsync();
     }
     
     private async Task<CancellationTicket> UpdateCancellationTicketAsync(int cancellationId, string? resolveNote, CancellationTicketStatus status)
