@@ -18,8 +18,10 @@ using Message = AirCnC.Application.Services.Email.Message;
 namespace AirCnC.Application.Services.Payments;
 public interface IPaymentService
 {
+    Task<PagedList<GetChargePaymentDto>> ChargePayment(ChargePaymentQueryParameter pqp);
     Task<string> CreateBookingPayment(string ip, CreateBookingPaymentDto createBookingPaymentDto);
     Task ReceiveDataFromVnp(VnPayReturnDto vnpayReturnDto);
+    Task<PagedList<GetRefundPaymentDto>> RefundPayment(RefundPaymentQueryParameter pqp);
     //Task<PagedList<UserVNPHistoryDTO>> GetVNPHistories(int userId, VNPParams vnpParams);
 }
 public class PaymentService : IPaymentService
@@ -33,13 +35,15 @@ public class PaymentService : IPaymentService
     private readonly ILogger<PaymentService> _logger;
     private readonly IMailTemplateHelper _mailTemplateHelper;
     private readonly IEmailSender _emailSender;
+    private readonly IRepository<ChargePayment> _chargePaymentRepository;
+    private readonly IRepository<RefundPayment> _refundPaymentRepository;
 
     public PaymentService(IRepository<BookingPayment> bookingPaymentRepository, IMapper mapper,
                           IOptions<PaymentConfig> paymentConfig, IUnitOfWork unitOfWork, IRepository<VnpHistory> vnpHistoryRepository,
                           IRepository<Booking> bookingRepository,
                           ILogger<PaymentService> logger,
                           IMailTemplateHelper mailTemplateHelper,
-                          IEmailSender emailSender)
+                          IEmailSender emailSender, IRepository<ChargePayment> chargePaymentRepository, IRepository<RefundPayment> refundPaymentRepository)
     {
         _bookingPaymentRepository = bookingPaymentRepository;
         _mapper = mapper;
@@ -50,6 +54,17 @@ public class PaymentService : IPaymentService
         _logger = logger;
         _mailTemplateHelper = mailTemplateHelper;
         _emailSender = emailSender;
+        _chargePaymentRepository = chargePaymentRepository;
+        _refundPaymentRepository = refundPaymentRepository;
+    }
+
+    public async Task<PagedList<GetChargePaymentDto>> ChargePayment(ChargePaymentQueryParameter pqp)
+    {
+        var spec = new ChargePaymentSpecification(pqp);
+        var ( chargePayments,  totalCount) = await _chargePaymentRepository.FindWithTotalCountAsync(spec);
+        var chargePaymentsDto = _mapper.Map<List<GetChargePaymentDto>>(chargePayments);
+        return new PagedList<GetChargePaymentDto>(chargePaymentsDto, totalCount, pqp.PageIndex, pqp.PageSize);
+
     }
 
     public async Task<string> CreateBookingPayment(string ip, CreateBookingPaymentDto createBookingPaymentDto)
@@ -181,10 +196,30 @@ public class PaymentService : IPaymentService
         }
     }
 
+    public async Task<PagedList<GetRefundPaymentDto>> RefundPayment(RefundPaymentQueryParameter pqp)
+    {
+        var spec = new RefundPaymentSpecification(pqp);
+        var (refundPayments, totalCount) = await _refundPaymentRepository.FindWithTotalCountAsync(spec);
+        var refundPaymentsDto = _mapper.Map<List<GetRefundPaymentDto>>(refundPayments);
+        return new PagedList<GetRefundPaymentDto>(refundPaymentsDto, totalCount, pqp.PageIndex, pqp.PageSize);
+    }
+
     //public async Task<PagedList<UserVNPHistoryDTO>> GetVNPHistories(int userId, VNPParams vnpParams)
     //{
     //    PagedList<vnpHistory> vnpHistoryList = await _paymentRepo.GetVNPHistories(userId, vnpParams);
     //    List<UserVNPHistoryDTO> vnpHistoryDTOList = vnpHistoryList.Records.Select(v => _mapper.Map<UserVNPHistoryDTO>(v)).ToList();
     //    return new PagedList<UserVNPHistoryDTO>(vnpHistoryDTOList, vnpHistoryList.TotalRecords);
     //}
+    public class PaymentMapping:Profile
+    {
+        public PaymentMapping()
+        {
+            CreateMap<ChargePayment, GetChargePaymentDto>()
+                .ForMember(dto=>dto.FullName,opt=>opt.MapFrom(src=>src.Host.User.FullName))
+                .ForMember(dto=>dto.UserId,opt=>opt.MapFrom(src=>src.Host.UserId));
+            CreateMap<RefundPayment,GetRefundPaymentDto>()
+                .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.Guest.User.FullName))
+                .ForMember(dto=>dto.UserId,opt=>opt.MapFrom(src=>src.Guest.UserId));
+        }
+    }
 }

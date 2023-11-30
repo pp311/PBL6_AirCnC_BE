@@ -26,7 +26,9 @@ public interface ICancellationService
     Task<PagedList<GetCancellationDto>> GetCancellationTicketsAsync(CancellationTicketQueryParameters ctp);
     Task<GetCancellationDto> GetCancellationTicketAsync(int cancellationTicketId);
     Task RejectCancellationTicketAsync(int cancellationTicketId, RejectCancellationTicketDto dto);
-    Task AcceptCancellationTicketAsync(int cancellationTicketId, AcceptCancellationTicketDto dto);
+
+    Task AcceptCancellationTicketAsync(int cancellationTicketId, string? resolveNote, double refundAmount,
+        double chargeAmount,double payoutAmount=0);
 }
 
 public class CancellationService : ICancellationService
@@ -44,6 +46,7 @@ public class CancellationService : ICancellationService
     private readonly PaymentConfig _paymentConfig;
     private readonly IEmailSender _emailSender;
     private readonly IMailTemplateHelper _mailTemplateHelper;
+    private readonly IRepository<HostPayment> _hostPaymentRepository;
 
     public CancellationService(IRepository<CancellationTicket> cancellationTicketsRepository,
                                IMapper mapper,
@@ -57,7 +60,8 @@ public class CancellationService : ICancellationService
                                IOptions<PaymentConfig> paymentConfig,
                                IRepository<Host> hostRepository,
                                IEmailSender emailSender,
-                               IMailTemplateHelper mailTemplateHelper)
+                               IMailTemplateHelper mailTemplateHelper,
+                               IRepository<HostPayment> hostPaymentRepository)
     {
         _cancellationTicketsRepository = cancellationTicketsRepository;
         _mapper = mapper;
@@ -72,6 +76,7 @@ public class CancellationService : ICancellationService
         _paymentConfig = paymentConfig.Value;
         _emailSender = emailSender;
         _mailTemplateHelper = mailTemplateHelper;
+        _hostPaymentRepository = hostPaymentRepository;
     }
 
     public async Task<GetCancellationDto> CreateCancellationTicketAsync(CreateCancellationDto dto)
@@ -84,7 +89,7 @@ public class CancellationService : ICancellationService
 
         cancellationTicket.Status = CancellationTicketStatus.Pending;
         cancellationTicket.IsIssuerGuest = dto.IsGuest;
-        cancellationTicket.TheOtherPartyId = dto.IsGuest ? booking.Property.HostId : booking.GuestId;
+        cancellationTicket.TheOtherPartyId = dto.IsGuest ? booking.Property.Host.UserId : booking.Guest.UserId;
         var today = DateTime.Now;
         
         if (booking.CheckInDate.Date >= today || booking.Status is BookingStatus.CheckedIn)
@@ -179,6 +184,8 @@ public class CancellationService : ICancellationService
         // Todo: add payment cac loai (refund, charge, payout)
         _cancellationTicketsRepository.Add(cancellationTicket);
         await _unitOfWork.SaveChangesAsync(); 
+        await AcceptCancellationTicketAsync(cancellationTicket.Id, cancellationTicket.ResolveNote, cancellationTicket.RefundAmount, 
+                                            cancellationTicket.ChargeAmount,payoutAmount);
         
         // Get lai cancellation ticket voi day du thong tin
         // Todo: Move mail sang background job
@@ -216,26 +223,24 @@ public class CancellationService : ICancellationService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task AcceptCancellationTicketAsync(int cancellationTicketId, AcceptCancellationTicketDto dto)
+    public async Task AcceptCancellationTicketAsync(int cancellationTicketId, string? resolveNote, double refundAmount,
+        double chargeAmount, double payoutAmount = 0)
     {
-        var cancellationTicket = await UpdateCancellationTicketAsync(cancellationTicketId, dto.ResolveNote, CancellationTicketStatus.Resolved);
+        var cancellationTicket = await UpdateCancellationTicketAsync(cancellationTicketId, resolveNote, CancellationTicketStatus.Resolved);
         
         var booking = await _bookingRepository.FindOneAsync(new BookingByIdSpecification(cancellationTicket.BookingId))
                       ?? throw new EntityNotFoundException(nameof(Booking), cancellationTicket.BookingId.ToString());
         
-        booking.Status = cancellationTicket.CreatedAt < booking.CheckInDate 
-                             ? BookingStatus.CancelledBeforeCheckIn 
-                             : BookingStatus.CancelledAfterCheckIn;
         
-        cancellationTicket.RefundAmount = dto.RefundAmount;
-        cancellationTicket.ChargeAmount = dto.ChargeAmount;
+        cancellationTicket.RefundAmount = refundAmount;
+        cancellationTicket.ChargeAmount = chargeAmount;
         
         //Todo: create refund payment & charge payment      
         var bookingPayment = booking.BookingPayment;
         if(bookingPayment is null)
             throw new EntityNotFoundException(nameof(BookingPayment), booking.Id.ToString());
         var vnpHistory = bookingPayment.VnpHistories.FirstOrDefault();
-        if (dto.RefundAmount!=0)
+        if (refundAmount!=0)
         {
             var refundPayment = (cancellationTicket.RefundPayment is not null)?cancellationTicket.RefundPayment : new RefundPayment
             {
@@ -250,7 +255,7 @@ public class CancellationService : ICancellationService
             cancellationTicket.RefundPayment = refundPayment;
         }
 
-        if (dto.ChargeAmount != 0)
+        if (chargeAmount != 0)
         {
             var chargePayment =(cancellationTicket.ChargePayment is not null)?cancellationTicket.ChargePayment: new ChargePayment
             {
@@ -262,6 +267,18 @@ public class CancellationService : ICancellationService
                 Status = ChargePaymentStatus.Pending
             };
             cancellationTicket.ChargePayment = chargePayment;
+        }
+
+        if (payoutAmount!=0)
+        {
+            var payoutPayment = new HostPayment()
+            {
+                Booking = cancellationTicket.Booking,
+                Amount = payoutAmount,
+                Status = HostPaymentStatus.Pending,
+                PaymentInfo = booking.Property.Host.PaymentInfo
+            };
+            _hostPaymentRepository.Add(payoutPayment);
         }
     
         await _unitOfWork.SaveChangesAsync();
