@@ -210,6 +210,8 @@ public static class SeedData
                                                : f.PickRandom<BookingStatus>())
             .RuleFor(b => b.GuestId, f => f.PickRandom(guests.Select(g => g.Id).ToList()))
             .RuleFor(b => b.Guid, _ => Guid.NewGuid().ToString())
+            .RuleFor(b => b.CreatedAt, (f, b) => f.Date.Between(b.CheckInDate.AddDays(-10), b.CheckInDate))
+            .RuleFor(b => b.LastModifiedAt, (_, b) => b.CreatedAt)
             .Generate(500);
         return bookings;
     }
@@ -300,6 +302,8 @@ public static class SeedData
             .RuleFor(p => p.PricePerNight, f => f.Random.Int(100, 50000) * 1000)
             .RuleFor(p => p.CleaningFee, f => f.Random.Int(30, 350) * 1000)
             .RuleFor(p => p.Status, f => f.PickRandom<PropertyStatus>())
+            .RuleFor(p => p.CreatedAt, f => f.Date.Past(1))
+            .RuleFor(p => p.LastModifiedAt, (_, b) => b.CreatedAt)
             .Generate(100);
         return props;
     }
