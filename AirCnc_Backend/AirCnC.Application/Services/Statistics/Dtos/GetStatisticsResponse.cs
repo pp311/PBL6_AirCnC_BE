@@ -1,3 +1,5 @@
+using AirCnC.Domain.Enums;
+
 namespace AirCnC.Application.Services.Statistics.Dtos;
 
 public class GetStatisticsResponse
@@ -15,6 +17,14 @@ public class GetStatisticsResponse
     public double TotalProfit { get; set; }
 
     public List<GetPropertyStatDto> Top10Properties { get; set; } = new();
+    public List<GetPropertyTypeStatDto> PropertyTypeStats { get; set; } = new();
+}
+
+public class GetPropertyTypeStatDto
+{
+    public PropertyType Type { get; set; }
+    public int TotalBookings { get; set; }
+    public double TotalRevenue { get; set; }
 }
 
 public class GetPropertyStatDto

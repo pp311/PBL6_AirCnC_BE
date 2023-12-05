@@ -41,6 +41,15 @@ public class StatisticsController : ControllerBase
             .Where(x => x.Status == BookingStatus.Completed)
             .Sum(x => x.TotalPrice - x.CleaningFee) * 0.03;
 
+        result.PropertyTypeStats = bookings.GroupBy(x => x.Property.Type)
+            .Select(g => new GetPropertyTypeStatDto
+            {
+                Type = g.Key,
+                TotalBookings = g.Count(),
+                TotalRevenue = g.Sum(x => x.TotalPrice)
+            })
+            .ToList();
+
         result.NewPropertiesCount = await _context.Set<Property>()
                                         .Where(x => !request.From.HasValue || x.CreatedAt >= request.From)
                                         .Where(x => !request.To.HasValue || x.CreatedAt <= request.To)
