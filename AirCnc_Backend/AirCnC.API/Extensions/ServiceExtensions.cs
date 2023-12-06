@@ -15,6 +15,7 @@ using AirCnC.Application.Services.Guests;
 using AirCnC.Application.Services.HostPayments;
 using AirCnC.Application.Services.Hosts;
 using AirCnC.Application.Services.ImageUploader;
+using AirCnC.Application.Services.PaymentInfos;
 using AirCnC.Application.Services.Payments;
 using AirCnC.Application.Services.Payments.Dtos;
 using AirCnC.Application.Services.Properties;
@@ -66,6 +67,7 @@ public static class ServiceExtensions
         services.AddScoped<ICancellationService, CancellationService>();
         services.AddScoped<IHostPaymentService,HostPaymentService>();
         services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IPaymentInfoService, PaymentInfoService>();
 
         return services;
     }
