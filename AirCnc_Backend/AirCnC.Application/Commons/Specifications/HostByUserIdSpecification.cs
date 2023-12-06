@@ -9,5 +9,6 @@ public class HostByUserIdSpecification : Specification<Host>
     {
         AddFilter(h => h.UserId == userId);
         AddInclude(h => h.User);
+        AddInclude(h => h.PaymentInfo);
     }
 }
