@@ -66,7 +66,7 @@ public class ChatService : IChatService
             contactDto.LastMessageTime = lastMessage?.CreatedAt ?? DateTime.MinValue;
         }
         
-        return contactDtos;
+        return contactDtos.OrderByDescending(_ => _.LastMessageTime).ToList();
     }
 }
 
