@@ -143,7 +143,8 @@ public class PropertyService : IPropertyService
         // Create host profile if not exist
         if (host is null)
         {
-            host = new Host { UserId = userId };
+            var paymentInfo = _mapper.Map<PaymentInfo>(upsertPropertyDto.PaymentInfo);
+            host = new Host { UserId = userId ,PaymentInfo = paymentInfo};
             _hostRepository.Add(host);
         }
 
