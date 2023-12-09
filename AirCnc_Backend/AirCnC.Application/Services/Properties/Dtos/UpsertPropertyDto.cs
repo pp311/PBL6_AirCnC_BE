@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using AirCnC.Application.Services.PaymentInfos.Dtos;
 using AirCnC.Domain.Enums;
 
 namespace AirCnC.Application.Services.Properties.Dtos
@@ -64,5 +65,7 @@ namespace AirCnC.Application.Services.Properties.Dtos
         
         [Required]
         public PropertyUtilityDto PropertyUtilities { get; set; } = new PropertyUtilityDto();
+        [Required]
+        public PaymentInfoDto PaymentInfo { get; set; } = new PaymentInfoDto();
     }
 }
