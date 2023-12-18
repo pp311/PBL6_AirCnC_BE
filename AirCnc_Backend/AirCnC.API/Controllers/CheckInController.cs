@@ -19,7 +19,7 @@ public class CheckInController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CheckIn(Guid code)
     {
-        await _checkInService.CheckInAsync(code);
-        return Ok();
+        var result= await _checkInService.CheckInAsync(code);
+        return Ok(result);
     }
 }
