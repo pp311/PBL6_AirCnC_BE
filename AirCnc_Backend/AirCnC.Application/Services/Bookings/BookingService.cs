@@ -87,6 +87,9 @@ public class BookingService : IBookingService
         var userId = int.Parse(_currentUser.Id!);
         createBookingDto.GuestId = (await _guestRepository.FindOneAsync(new GuestByUserIdSpecification(userId)))?.Id
                       ?? throw new EntityNotFoundException(nameof(Guest), userId.ToString());
+        //add 1 day to check-in and check-out date #FE fix later
+        //createBookingDto.CheckInDate = createBookingDto.CheckInDate.AddDays(1);
+        //createBookingDto.CheckOutDate = createBookingDto.CheckOutDate.AddDays(1);
 
         // Validate input
         await ValidateInput(createBookingDto, propertyInfo);

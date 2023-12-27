@@ -9,6 +9,7 @@ namespace AirCnC.Application.Services.Properties.Dtos
         public PropertyType Type { get; set; }
 
         public int BedCount { get; set; }
+        public int BedroomCount { get; set; }
         public int BathroomCount { get; set; }
         public int MaxAdultCount { get; set; }
         public int MaxChildCount { get; set; }
@@ -36,7 +37,8 @@ namespace AirCnC.Application.Services.Properties.Dtos
         
         [JsonProperty(NullValueHandling=NullValueHandling.Ignore)]        
         public ICollection<GetPropertyUtilityDto>? PropertyUtilities { get; set; }
-        
+        public CancellationPolicyType CancellationPolicyType { get; set; }
+
         public PropertyStatus Status { get; set; }
         public string? RejectionReason { get; set; }
     }
