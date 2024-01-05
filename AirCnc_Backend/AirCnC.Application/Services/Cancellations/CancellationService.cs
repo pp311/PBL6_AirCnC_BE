@@ -260,7 +260,7 @@ public class CancellationService : ICancellationService
                 CancellationTicket = cancellationTicket,
                 Status = RefundPaymentStatus.Pending
             };
-            await Refund(vnpHistory, refundPayment, "0.0.0.0");
+            //await Refund(vnpHistory, refundPayment, "0.0.0.0");
             cancellationTicket.RefundPayment = refundPayment;
         }
 
@@ -403,26 +403,26 @@ public class CancellationService : ICancellationService
                 var code = responseData["vnp_ResponseCode"].ToString();
                 switch (code)
                 {
-                    case "00":
-                        refundPayment.Status = RefundPaymentStatus.Success;
-                        break;
-                    case "03":
-                        throw new BadInputException("Dữ liệu gửi sang không đúng định dạng");
-                    case "02":
-                        throw new BadInputException("kiểm tra lại TmnCode");
-                    case "91":
-                        throw new EntityNotFoundException(nameof(refundPayment),refundPayment.PaymentCode);
-                    case "94":
-                        refundPayment.Status = RefundPaymentStatus.Pending;
-                        throw new EntityAlreadyExistedException(nameof(refundPayment),refundPayment.PaymentCode);
-                    case "95":
-                        refundPayment.Status = RefundPaymentStatus.Pending;
-                        break;
-                    //throw new ForbiddenAccessException("Giao dịch này không thành công bên VNPAY. VNPAY từ chối xử lý yêu cầu");
-                    case "97":
-                        throw new ForbiddenAccessException("Checksum không hợp lệ");
-                    case "99":
-                        throw new ForbiddenAccessException("Lỗi không xác định");
+                    //case "00":
+                    //    refundPayment.Status = RefundPaymentStatus.Success;
+                    //    break;
+                    //case "03":
+                    //    throw new BadInputException("Dữ liệu gửi sang không đúng định dạng");
+                    //case "02":
+                    //    throw new BadInputException("kiểm tra lại TmnCode");
+                    //case "91":
+                    //    throw new EntityNotFoundException(nameof(refundPayment),refundPayment.PaymentCode);
+                    //case "94":
+                    //    refundPayment.Status = RefundPaymentStatus.Pending;
+                    //    throw new EntityAlreadyExistedException(nameof(refundPayment),refundPayment.PaymentCode);
+                    //case "95":
+                    //    refundPayment.Status = RefundPaymentStatus.Pending;
+                    //    break;
+                    ////throw new ForbiddenAccessException("Giao dịch này không thành công bên VNPAY. VNPAY từ chối xử lý yêu cầu");
+                    //case "97":
+                    //    throw new ForbiddenAccessException("Checksum không hợp lệ");
+                    //case "99":
+                    //    throw new ForbiddenAccessException("Lỗi không xác định");
                     default:
                         refundPayment.Status = RefundPaymentStatus.Pending;
                         break;
