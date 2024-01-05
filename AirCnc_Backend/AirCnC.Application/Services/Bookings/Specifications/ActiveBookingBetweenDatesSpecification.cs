@@ -13,7 +13,8 @@ public class ActiveBookingBetweenDatesSpecification : Specification<Booking>
         AddFilter(p => p.PropertyId == propertyId);
         
         AddFilter(p => p.Status != BookingStatus.Rejected && p.Status != BookingStatus.CancelledAfterCheckIn
-                                                          && p.Status != BookingStatus.Completed);
+                                                          && p.Status != BookingStatus.Completed
+                                                          && p.Status != BookingStatus.CancelledBeforeCheckIn);
 
         AddFilter(p => (p.CheckOutDate.Date <= toDate.Date && p.CheckOutDate.Date > fromDate.Date)
                 || (p.CheckInDate.Date <= toDate.Date && p.CheckInDate.Date >= fromDate.Date));
