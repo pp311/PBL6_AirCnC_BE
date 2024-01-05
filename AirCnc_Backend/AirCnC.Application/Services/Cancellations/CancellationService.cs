@@ -416,7 +416,9 @@ public class CancellationService : ICancellationService
                         refundPayment.Status = RefundPaymentStatus.Pending;
                         throw new EntityAlreadyExistedException(nameof(refundPayment),refundPayment.PaymentCode);
                     case "95":
-                        throw new ForbiddenAccessException("Giao dịch này không thành công bên VNPAY. VNPAY từ chối xử lý yêu cầu");
+                        refundPayment.Status = RefundPaymentStatus.Pending;
+                        break;
+                    //throw new ForbiddenAccessException("Giao dịch này không thành công bên VNPAY. VNPAY từ chối xử lý yêu cầu");
                     case "97":
                         throw new ForbiddenAccessException("Checksum không hợp lệ");
                     case "99":
